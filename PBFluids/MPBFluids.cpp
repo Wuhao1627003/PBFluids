@@ -2,15 +2,7 @@
 
 #include <fstream>
 
-MObject MPBFluids::radiusObj;
-MObject MPBFluids::densityObj;
-MObject MPBFluids::viscosityObj;
-MObject MPBFluids::dtObj;
-MObject MPBFluids::timeObj;
-MObject MPBFluids::numParticlesObj;
-MObject MPBFluids::widthObj;
-MObject MPBFluids::heightObj;
-MObject MPBFluids::outputGeometry;
+MObject MPBFluids::inputObjects[];
 MTypeId MPBFluids::id(0x80000);
 
 MStatus MPBFluids::initialize()
@@ -21,51 +13,25 @@ MStatus MPBFluids::initialize()
 	MFnTypedAttribute tattr;
 	MFnUnitAttribute uattr;
 
-	radiusObj = nattr.create("radius", "r", MFnNumericData::kDouble, 1, &returnStatus);
-	densityObj = nattr.create("density", "ro", MFnNumericData::kDouble, 1, &returnStatus);
-	viscosityObj = nattr.create("viscosity", "vs", MFnNumericData::kDouble, 1, &returnStatus);
-	dtObj = nattr.create("deltaT", "dt", MFnNumericData::kDouble, 1, &returnStatus);
-	timeObj = uattr.create("timeStep", "t", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
-	numParticlesObj = uattr.create("numParticles", "n", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
-	widthObj = uattr.create("width", "w", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
-	heightObj = uattr.create("height", "h", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
-	outputGeometry = tattr.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
+	inputObjects[0] = nattr.create("radius", "r", MFnNumericData::kDouble, 1, &returnStatus);
+	inputObjects[1] = nattr.create("density", "ro", MFnNumericData::kDouble, 1, &returnStatus);
+	inputObjects[2] = nattr.create("viscosity", "vs", MFnNumericData::kDouble, 1, &returnStatus);
+	inputObjects[3] = nattr.create("deltaT", "dt", MFnNumericData::kDouble, 1, &returnStatus);
+	inputObjects[4] = uattr.create("timeStep", "t", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
+	inputObjects[5] = uattr.create("numParticles", "n", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	inputObjects[6] = uattr.create("width", "w", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	inputObjects[7] = uattr.create("height", "h", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	inputObjects[8] = tattr.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
 
-	returnStatus = addAttribute(radiusObj);
-	McheckErr(returnStatus, "ERROR adding radius attribute\n");
-	returnStatus = addAttribute(densityObj);
-	McheckErr(returnStatus, "ERROR adding density attribute\n");
-	returnStatus = addAttribute(viscosityObj);
-	McheckErr(returnStatus, "ERROR adding viscosity attribute\n");
-	returnStatus = addAttribute(dtObj);
-	McheckErr(returnStatus, "ERROR adding deltaT attribute\n");
-	returnStatus = addAttribute(timeObj);
-	McheckErr(returnStatus, "ERROR adding timeStep attribute\n");
-	returnStatus = addAttribute(numParticlesObj);
-	McheckErr(returnStatus, "ERROR adding numParticles attribute\n");
-	returnStatus = addAttribute(widthObj);
-	McheckErr(returnStatus, "ERROR adding width attribute\n");
-	returnStatus = addAttribute(heightObj);
-	McheckErr(returnStatus, "ERROR adding height attribute\n");
-	returnStatus = addAttribute(outputGeometry);
-	McheckErr(returnStatus, "ERROR adding outputGeometry attribute\n");
+	for (size_t objCount = 0; objCount < 9; objCount ++) {
+		returnStatus = addAttribute(inputObjects[objCount]);
+		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attribute\n");
+	}
 
-	returnStatus = attributeAffects(radiusObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in radius attributeAffects\n");
-	returnStatus = attributeAffects(densityObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in density attributeAffects\n");
-	returnStatus = attributeAffects(viscosityObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in viscosity attributeAffects\n");
-	returnStatus = attributeAffects(dtObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in deltaT attributeAffects\n");
-	returnStatus = attributeAffects(timeObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in timeStep attributeAffects\n");
-	returnStatus = attributeAffects(numParticlesObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in numParticles attributeAffects\n");
-	returnStatus = attributeAffects(widthObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in width attributeAffects\n");
-	returnStatus = attributeAffects(heightObj, outputGeometry);
-	McheckErr(returnStatus, "ERROR in height attributeAffects\n");
+	for (size_t objCount = 0; objCount < 8; objCount++) {
+		returnStatus = attributeAffects(inputObjects[objCount], inputObjects[8]);
+		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attributeAffects\n");
+	}
 
 	return returnStatus;
 }
@@ -74,29 +40,31 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 {
 	MStatus returnStatus;
 
-	if (plug == outputGeometry)
+	if (plug == inputObjects[8])
 	{
+		int width, height, time;
+		float density, dt, radius, viscosity;
+		long numParticles;
+
 		// Input handles
-		MDataHandle grammarFileHandle = data.inputValue(grammarFile_, &returnStatus);
-		McheckErr(returnStatus, "Error getting grammarFile_ data handle\n");
-		MString grammarFileString = grammarFileHandle.asString();
-		if (grammarFileString == "")
-		{
-			return MS::kSuccess;
+		MDataHandle dataHandle[9];
+		for (size_t objCount = 0; objCount < 8; objCount++) {
+			dataHandle[objCount] = data.inputValue(inputObjects[objCount], &returnStatus);
+			McheckErr(returnStatus, "Error getting " + objectNames[objCount] + " data handle\n");
 		}
 
-		MDataHandle defaultAngleHandle = data.inputValue(defaultAngle_, &returnStatus);
-		McheckErr(returnStatus, "Error getting defaultAngle_ data handle\n");
-		double defaultAngle = defaultAngleHandle.asDouble();
-		MDataHandle defaultStepSizeHandle = data.inputValue(defaultStepSize_, &returnStatus);
-		McheckErr(returnStatus, "Error getting defaultStepSize_ data handle\n");
-		double defaultStepSize = defaultStepSizeHandle.asDouble();
-		MDataHandle numIterHandle = data.inputValue(numIter_, &returnStatus);
-		McheckErr(returnStatus, "Error getting numIter_ data handle\n");
-		int numIter = (int) numIterHandle.asTime().value();
+		// radius, density, viscosity, dt, time, numParticles, width, height, outputGeometry;
+		radius = dataHandle[0].asFloat();
+		density = dataHandle[1].asFloat();
+		viscosity = dataHandle[2].asFloat();
+		dt  = dataHandle[3].asFloat();
+		time = dataHandle[4].asInt();
+		numParticles = (long) dataHandle[5].asInt2();
+		width = dataHandle[6].asInt();
+		height = dataHandle[7].asInt();
 
 		// Output handle
-		MDataHandle outputGeometryHandle = data.outputValue(outputGeometry, &returnStatus);
+		dataHandle[8] = data.outputValue(inputObjects[8], &returnStatus);
 		McheckErr(returnStatus, "ERROR getting geometry data handle\n");
 
 		// Mesh manipulation
@@ -104,6 +72,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
 
+		/*
 		// Get file path as string
 		std::string filePath = grammarFileString.asChar();
 
@@ -151,9 +120,10 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 						  points, faceCounts, faceConnects, newOutputData, &returnStatus);
 			McheckErr(returnStatus, "ERROR creating new geometry");
 		}
+		*/
 
 		// Sets output geometry data to newly processed data
-		outputGeometryHandle.set(newOutputData);
+		dataHandle[8].set(newOutputData);
 		data.setClean(plug);
 	}
 	else

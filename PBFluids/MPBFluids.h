@@ -14,11 +14,15 @@
 
 #include <maya/MIOStream.h>
 
+using namespace std;
+
 #define McheckErr(stat,msg)			\
 	if (MS::kSuccess != stat) {	    \
 		cerr << msg;				\
 		return MS::kFailure;		\
 	}
+
+const string objectNames[] = { "radius", "density", "viscosity", "dt", "time", "numParticles", "width", "height", "outputGeometry" };
 
 class MPBFluids :
 	public MPxNode
@@ -30,7 +34,8 @@ public:
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
-	static MObject radiusObj, densityObj, viscosityObj, dtObj, timeObj, numParticlesObj, widthObj, heightObj, outputGeometry;
+	// radius, density, viscosity, dt, time, numParticles, width, height, outputGeometry;
+	static MObject inputObjects[9];
 	static MTypeId id;
 };
 

@@ -1,5 +1,5 @@
 #include "MPBFluids.h"
-
+#include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 
 MStatus initializePlugin(MObject obj)

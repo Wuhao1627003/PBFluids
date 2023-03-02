@@ -1,6 +1,6 @@
 #include "Grid.h"
 
-Grid::Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius)
+Grid::Grid()
 {
 
 }
