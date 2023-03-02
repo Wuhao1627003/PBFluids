@@ -1,52 +1,76 @@
-#include "LSystemNode.h"
+#include "MPBFluids.h"
 
 #include <fstream>
 
-MObject LSystemNode::defaultAngle_;
-MObject LSystemNode::defaultStepSize_;
-MObject LSystemNode::numIter_;
-MObject LSystemNode::grammarFile_;
-MObject LSystemNode::outputGeometry;
-MTypeId LSystemNode::id(0x80000);
+MObject MPBFluids::radiusObj;
+MObject MPBFluids::densityObj;
+MObject MPBFluids::viscosityObj;
+MObject MPBFluids::dtObj;
+MObject MPBFluids::timeObj;
+MObject MPBFluids::numParticlesObj;
+MObject MPBFluids::widthObj;
+MObject MPBFluids::heightObj;
+MObject MPBFluids::outputGeometry;
+MTypeId MPBFluids::id(0x80000);
 
-MStatus LSystemNode::initialize()
+MStatus MPBFluids::initialize()
 {
 	MStatus returnStatus;
 
-	MFnNumericAttribute defaultAngle_, defaultStepSize_;
-	MFnTypedAttribute grammarFile_, outputGeometry;
-	MFnUnitAttribute numIter_;
+	MFnNumericAttribute nattr;
+	MFnTypedAttribute tattr;
+	MFnUnitAttribute uattr;
 
-	LSystemNode::defaultAngle_ = defaultAngle_.create("defaultAngle", "da", MFnNumericData::kDouble, 1, &returnStatus);
-	LSystemNode::defaultStepSize_ = defaultStepSize_.create("defaultStepSize", "ds", MFnNumericData::kDouble, 1, &returnStatus);
-	LSystemNode::numIter_ = numIter_.create("numIter", "n", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
-	LSystemNode::grammarFile_ = grammarFile_.create("grammar", "g", MFnData::kString, MObject::kNullObj, &returnStatus);
-	LSystemNode::outputGeometry = outputGeometry.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
+	radiusObj = nattr.create("radius", "r", MFnNumericData::kDouble, 1, &returnStatus);
+	densityObj = nattr.create("density", "ro", MFnNumericData::kDouble, 1, &returnStatus);
+	viscosityObj = nattr.create("viscosity", "vs", MFnNumericData::kDouble, 1, &returnStatus);
+	dtObj = nattr.create("deltaT", "dt", MFnNumericData::kDouble, 1, &returnStatus);
+	timeObj = uattr.create("timeStep", "t", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
+	numParticlesObj = uattr.create("numParticles", "n", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	widthObj = uattr.create("width", "w", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	heightObj = uattr.create("height", "h", MFnUnitAttribute::Type::kLast, 0, &returnStatus);
+	outputGeometry = tattr.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
 
-	returnStatus = addAttribute(LSystemNode::defaultAngle_);
-	McheckErr(returnStatus, "ERROR adding defaultAngle_ attribute\n");
-	returnStatus = addAttribute(LSystemNode::defaultStepSize_);
-	McheckErr(returnStatus, "ERROR adding defaultStepSize_ attribute\n");
-	returnStatus = addAttribute(LSystemNode::numIter_);
-	McheckErr(returnStatus, "ERROR adding numIter_ attribute\n");
-	returnStatus = addAttribute(LSystemNode::grammarFile_);
-	McheckErr(returnStatus, "ERROR adding grammar attribute\n");
-	returnStatus = addAttribute(LSystemNode::outputGeometry);
+	returnStatus = addAttribute(radiusObj);
+	McheckErr(returnStatus, "ERROR adding radius attribute\n");
+	returnStatus = addAttribute(densityObj);
+	McheckErr(returnStatus, "ERROR adding density attribute\n");
+	returnStatus = addAttribute(viscosityObj);
+	McheckErr(returnStatus, "ERROR adding viscosity attribute\n");
+	returnStatus = addAttribute(dtObj);
+	McheckErr(returnStatus, "ERROR adding deltaT attribute\n");
+	returnStatus = addAttribute(timeObj);
+	McheckErr(returnStatus, "ERROR adding timeStep attribute\n");
+	returnStatus = addAttribute(numParticlesObj);
+	McheckErr(returnStatus, "ERROR adding numParticles attribute\n");
+	returnStatus = addAttribute(widthObj);
+	McheckErr(returnStatus, "ERROR adding width attribute\n");
+	returnStatus = addAttribute(heightObj);
+	McheckErr(returnStatus, "ERROR adding height attribute\n");
+	returnStatus = addAttribute(outputGeometry);
 	McheckErr(returnStatus, "ERROR adding outputGeometry attribute\n");
 
-	returnStatus = attributeAffects(LSystemNode::defaultAngle_, LSystemNode::outputGeometry);
-	McheckErr(returnStatus, "ERROR in defaultAngle_ attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::defaultStepSize_, LSystemNode::outputGeometry);
-	McheckErr(returnStatus, "ERROR in defaultStepSize_ attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::numIter_, LSystemNode::outputGeometry);
-	McheckErr(returnStatus, "ERROR in numIter_ attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::grammarFile_, LSystemNode::outputGeometry);
-	McheckErr(returnStatus, "ERROR in grammar attributeAffects\n");
+	returnStatus = attributeAffects(radiusObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in radius attributeAffects\n");
+	returnStatus = attributeAffects(densityObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in density attributeAffects\n");
+	returnStatus = attributeAffects(viscosityObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in viscosity attributeAffects\n");
+	returnStatus = attributeAffects(dtObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in deltaT attributeAffects\n");
+	returnStatus = attributeAffects(timeObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in timeStep attributeAffects\n");
+	returnStatus = attributeAffects(numParticlesObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in numParticles attributeAffects\n");
+	returnStatus = attributeAffects(widthObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in width attributeAffects\n");
+	returnStatus = attributeAffects(heightObj, outputGeometry);
+	McheckErr(returnStatus, "ERROR in height attributeAffects\n");
 
 	return returnStatus;
 }
 
-MStatus LSystemNode::compute(const MPlug &plug, MDataBlock &data)
+MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 {
 	MStatus returnStatus;
 

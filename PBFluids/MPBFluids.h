@@ -1,8 +1,5 @@
 #pragma once
 
-#include "LSystemCmd.h"
-#include "cylinder.h"
-
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnNumericAttribute.h>
@@ -23,17 +20,17 @@
 		return MS::kFailure;		\
 	}
 
-class LSystemNode :
+class MPBFluids :
 	public MPxNode
 {
 public:
-	LSystemNode() {};
-	virtual ~LSystemNode() override {};
+	MPBFluids() {};
+	virtual ~MPBFluids() override {};
 	MStatus compute(const MPlug &plug, MDataBlock &data) override;
-	static void *creator() { return new LSystemNode; }
+	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
-	static MObject defaultStepSize_, defaultAngle_, outputGeometry, grammarFile_, numIter_;
+	static MObject radiusObj, densityObj, viscosityObj, dtObj, timeObj, numParticlesObj, widthObj, heightObj, outputGeometry;
 	static MTypeId id;
 };
 

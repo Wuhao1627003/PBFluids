@@ -139,11 +139,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LSystemNode.cpp" />
+    <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="MPBFluids.cpp" />
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PluginMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LSystemNode.h" />
+    <ClInclude Include="Cell.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="MPBFluids.h" />
+    <ClInclude Include="Particle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

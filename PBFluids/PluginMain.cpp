@@ -1,22 +1,14 @@
-#include "LSystemNode.h"
+#include "MPBFluids.h"
 
 #include <maya/MFnPlugin.h>
 
 MStatus initializePlugin(MObject obj)
 {
 	MStatus   status = MStatus::kSuccess;
-	MFnPlugin plugin(obj, "MyPlugin", "1.0", "Any");
-
-	// Register Command
-	status = plugin.registerCommand("LSystemCmd", LSystemCmd::creator);
-	if (!status)
-	{
-		status.perror("registerCommand");
-		return status;
-	}
+	MFnPlugin plugin(obj, "MPBFluids", "1.0", "Any");
 
 	// Register node
-	status = plugin.registerNode("LSystemNode", LSystemNode::id, LSystemNode::creator, LSystemNode::initialize);
+	status = plugin.registerNode("MPBFluids", MPBFluids::id, MPBFluids::creator, MPBFluids::initialize);
 	if (!status)
 	{
 		status.perror("registerNode");
@@ -38,14 +30,7 @@ MStatus uninitializePlugin(MObject obj)
 	MStatus   status = MStatus::kSuccess;
 	MFnPlugin plugin(obj);
 
-	status = plugin.deregisterCommand("LSystemCmd");
-	if (!status)
-	{
-		status.perror("deregisterCommand");
-		return status;
-	}
-
-	status = plugin.deregisterNode(LSystemNode::id);
+	status = plugin.deregisterNode(MPBFluids::id);
 	if (!status)
 	{
 		status.perror("deregisterNode");
