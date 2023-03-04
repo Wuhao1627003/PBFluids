@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Grid.h"
+
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnNumericAttribute.h>

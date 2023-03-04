@@ -59,7 +59,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		viscosity = dataHandle[2].asFloat();
 		dt  = dataHandle[3].asFloat();
 		time = dataHandle[4].asInt();
-		numParticles = (long) dataHandle[5].asInt2();
+		numParticles = (long) (dataHandle[5].asInt64());
 		width = dataHandle[6].asInt();
 		height = dataHandle[7].asInt();
 
@@ -71,6 +71,15 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		MFnMeshData dataCreator;
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
+
+		Grid grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
+		for (int t = 0; t < time; t++) {
+			grid.step();
+		}
+
+		for (Particle p : grid.particles) {
+			MPoint particlePos = MPoint(get<0>(p.pos), get<1>(p.pos), get<2>(p.pos));
+		}
 
 		/*
 		// Get file path as string
