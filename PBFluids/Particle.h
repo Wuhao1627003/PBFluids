@@ -13,5 +13,6 @@ public:
 	float density, gradNorm, lambda;
 
 	void step(float dt);
+	Particle(long ID, int cellIdx, const vec3 &pos, const vec3 &vel, float density, float gradNorm, float lambda);
 };
 

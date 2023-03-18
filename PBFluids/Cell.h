@@ -13,6 +13,6 @@ public:
 	vector<int> neighborCellIdxs;
 	bool isBoundary;
 
-	Cell();
+	Cell(const coord &cellCoord, const vector<long> &particleIDs, const vector<int> &neighborCellIdxs, bool isBoundary);
 };
 

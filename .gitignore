@@ -2,3 +2,4 @@
 *.opendb
 PBFluids/.vs/*
 PBFluids/x64/*
+PBFluids/Deps/.vs/

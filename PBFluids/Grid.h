@@ -8,6 +8,9 @@ static class Grid
 public:
 	vector<Cell> gridCells;
 	vector<Particle> particles;
+	int width, height;
+	long numParticles;
+	float radius;
 		
 	Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius):
 		width(width), height(height), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
@@ -19,9 +22,7 @@ public:
 	void step();
 
 private:
-	int width, height;
-	float density, dt, radius, viscosity;
-	long numParticles;
+	float density, dt, viscosity;
 	map<coord, int> cellCoordMap;
 
 	void initGrid();

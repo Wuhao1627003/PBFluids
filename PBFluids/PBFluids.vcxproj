@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>S:\Maya2022\devkitBase\plugins\plugins\</OutDir>
+    <OutDir>$(MAYA_LOCATION)\devkitBase\plugins\plugins\</OutDir>
     <TargetExt>.mll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -108,14 +108,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NT_PLUGIN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>S:\Maya2022\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MAYA_LOCATION)\include;$(ProjectDir)\Deps\freeglut-3.4.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(ProjectName).mll</OutputFile>
-      <AdditionalLibraryDirectories>S:\Maya2022\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MAYA_LOCATION)\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;OpenMaya.lib;OpenMayaRender.lib;Foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
@@ -142,14 +142,17 @@
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="MPBFluids.cpp" />
+    <ClCompile Include="OpenGLMain.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PluginMain.cpp" />
+    <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="MPBFluids.h" />
     <ClInclude Include="Particle.h" />
+    <ClInclude Include="Render.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
