@@ -3,7 +3,7 @@
 #include "Particle.h"
 #include <map>
 using namespace std;
-static class Grid
+class Grid
 {
 public:
 	vector<Cell> gridCells;
@@ -12,19 +12,24 @@ public:
 	long numParticles;
 	float radius;
 		
+	Grid() {};
 	Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius):
 		width(width), height(height), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
-	{};
-	~Grid();
-	void updateParticleCell(Particle *p);
+	{
+		initParticles();
+		initCells();
+	};
+	// initialize all properties of particles
 	void initParticles();
+	// initialize all properties of cells, and populate with particles
 	void initCells();
+	// update the cell that the particle is in
+	void updateParticleCell(Particle *p);
+	// go forward one time step for all particles and cells
 	void step();
 
 private:
 	float density, dt, viscosity;
-	map<coord, int> cellCoordMap;
-
-	void initGrid();
+	// map of cell coordinates to cell index
+	map<vec3, int> cellCoordMap;
 };
-

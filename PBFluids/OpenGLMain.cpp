@@ -1,17 +1,29 @@
-// Currently copied from example
 #include "Render.h"
+#include <functional>
+
+Grid grid;
+Render r;
+
+void Display()
+{
+    r.render();
+}
+
+void Step()
+{
+    grid.step();
+}
 
 int main(int argc, char **argv)
 {
+    grid = Grid(200, 15, 0.5, 0, kParticleCount, 0.5, kParticleRadius);
+    r.setGrid(grid);
+
     glutInitWindowSize(kScreenWidth, kScreenHeight);
     glutInit(&argc, argv);
-    glutInitDisplayString("samples stencil>=3 rgb double depth");
     glutCreateWindow("SPH");
-    glutDisplayFunc(Render);
-    glutIdleFunc(Update);
-
-    memset(particles, 0, kParticleCount * sizeof(Particle));
-    UpdateGrid();
+    glutDisplayFunc(Display);
+    glutIdleFunc(Step);
 
     glutMainLoop();
 

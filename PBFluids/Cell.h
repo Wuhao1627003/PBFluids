@@ -1,18 +1,20 @@
 #pragma once
 #include <vector>
 #include <tuple>
+#include "Utils/vec.h"
 using namespace std;
-
-typedef tuple<int, int, int> coord;
 
 class Cell
 {
 public:
-	coord cellCoord;
+	vec3 cellCoord;
 	vector<long> particleIDs;
 	vector<int> neighborCellIdxs;
+	// whether this cell is a boundary cell
 	bool isBoundary;
 
-	Cell(const coord &cellCoord, const vector<long> &particleIDs, const vector<int> &neighborCellIdxs, bool isBoundary);
+	Cell(const vec3 &cellCoord) : cellCoord(cellCoord) {};
+	// update the neighbor cells of this cell
+	void updateNeighbors(const vector<int> &neighborCellIdxs);
 };
 

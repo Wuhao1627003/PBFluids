@@ -78,7 +78,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		}
 
 		for (Particle p : grid.particles) {
-			MPoint particlePos = MPoint(get<0>(p.pos), get<1>(p.pos), get<2>(p.pos));
+			MPoint particlePos = MPoint(p.pos[0], p.pos[0], p.pos[2]);
 		}
 
 		/*

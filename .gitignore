@@ -3,3 +3,8 @@
 PBFluids/.vs/*
 PBFluids/x64/*
 PBFluids/Deps/.vs/
+PBFluids/Deps/freeglut_static.dir/Debug/*
+PBFluids/Deps/x64/Debug/ALL_BUILD/*
+PBFluids/Deps/x64/Debug/ZERO_CHECK/*
+PBFluids/Deps/freeglut.dir/Debug/freeglut.tlog/*
+PBFluids/Deps/CMakeFiles/3.25.3/CompilerIdC/Debug/CompilerIdC.tlog/*

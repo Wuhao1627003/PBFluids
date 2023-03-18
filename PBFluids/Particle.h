@@ -1,8 +1,6 @@
 #pragma once
-#include <tuple>
+#include "Utils/vec.h"
 using namespace std;
-
-typedef tuple<float, float, float> vec3;
 
 class Particle
 {
@@ -12,7 +10,8 @@ public:
 	vec3 pos, vel;
 	float density, gradNorm, lambda;
 
+	Particle(long ID, int cellIdx, const vec3 &pos, const vec3 &vel, float density, float gradNorm, float lambda) {};
+	// update the particle's position and velocity
 	void step(float dt);
-	Particle(long ID, int cellIdx, const vec3 &pos, const vec3 &vel, float density, float gradNorm, float lambda);
 };
 

@@ -115,8 +115,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(ProjectName).mll</OutputFile>
-      <AdditionalLibraryDirectories>$(MAYA_LOCATION)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;OpenMaya.lib;OpenMayaRender.lib;Foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MAYA_LOCATION)\lib;$(ProjectDir)\Deps\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglutd.lib;odbc32.lib;odbccp32.lib;OpenMaya.lib;OpenMayaRender.lib;Foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -146,6 +146,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PluginMain.cpp" />
     <ClCompile Include="Render.cpp" />
+    <ClCompile Include="Utils\vec.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="MPBFluids.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="Utils\vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
