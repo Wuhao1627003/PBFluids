@@ -77,50 +77,29 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 			grid.step();
 		}
 
+		std::vector<MPoint> worldPositions;
 		for (Particle p : grid.particles) {
 			MPoint particlePos = MPoint(p.pos[0], p.pos[0], p.pos[2]);
+			worldPositions.push_back(particlePos);
 		}
 
-		/*
-		// Get file path as string
-		std::string filePath = grammarFileString.asChar();
+		SphereMesh baseSphere = SphereMesh(worldPositions[0], radius);
 
-		LSystem system = LSystem();
-		system.loadProgram(filePath);
-		system.setDefaultAngle((float)defaultAngle);
-		system.setDefaultStep((float)defaultStepSize);
-
-		std::vector<LSystem::Branch> branches;
-		system.process(numIter, branches);
-		std::vector<MPoint> worldPositions;
-
-		for each (LSystem::Branch branch in branches)
-		{
-			MPoint curveStart = MPoint(branch.first[0], branch.first[1], branch.first[2]);
-			worldPositions.push_back(curveStart);
-		}
-
-		if (worldPositions.size() > 0)
-		{
-			// Get start and end point of first cylinder (will serve as base of mesh)
+		if (worldPositions.size() > 0) {
+			// Get start point of first sphere (will serve as base of mesh)
 			MPoint initialStart = MPoint(worldPositions[0].x, worldPositions[0].y, worldPositions[0].z);
-			MPoint initialEnd = MPoint(worldPositions[1].x, worldPositions[1].y, worldPositions[1].z);
-			CylinderMesh baseCylinder = CylinderMesh(initialStart, initialEnd, 1);
+			SphereMesh baseSphere = SphereMesh(initialStart, radius);
 
-			// Get cylinder data
+			// Get sphere data
 			MPointArray points;
 			MIntArray faceCounts;
 			MIntArray faceConnects;
-			baseCylinder.getMesh(points, faceCounts, faceConnects);
+			baseSphere.getMesh(points, faceCounts, faceConnects);
 
-			// Add rest of cylinders to mesh
-			for (int i = 1; i < worldPositions.size() - 1; i++)
-			{
-				MPoint startPoint = worldPositions[i];
-				MPoint endPoint = worldPositions[i + 1];
-				CylinderMesh cylinder = CylinderMesh(startPoint, endPoint, 1);
-
-				cylinder.appendToMesh(points, faceCounts, faceConnects);
+			// Add rest of spheres to mesh
+			for (MPoint point : worldPositions) {
+				SphereMesh sphere = SphereMesh(point, radius);
+				sphere.appendToMesh(points, faceCounts, faceConnects);
 			}
 
 			// Create mesh
@@ -129,7 +108,6 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 						  points, faceCounts, faceConnects, newOutputData, &returnStatus);
 			McheckErr(returnStatus, "ERROR creating new geometry");
 		}
-		*/
 
 		// Sets output geometry data to newly processed data
 		dataHandle[8].set(newOutputData);

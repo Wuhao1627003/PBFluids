@@ -39,6 +39,9 @@
     <ClCompile Include="Utils\vec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MPBFluids.h">
@@ -59,5 +62,13 @@
     <ClInclude Include="Utils\vec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PBFluidsMel.mel">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

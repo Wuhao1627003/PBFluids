@@ -146,6 +146,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PluginMain.cpp" />
     <ClCompile Include="Render.cpp" />
+    <ClCompile Include="sphere.cpp" />
     <ClCompile Include="Utils\vec.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +155,11 @@
     <ClInclude Include="MPBFluids.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="Utils\vec.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PBFluidsMel.mel" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
