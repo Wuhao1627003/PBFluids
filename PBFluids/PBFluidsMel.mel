@@ -59,16 +59,16 @@ global proc makeWindow()
     			setParent ..;
     			
     			rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
-        			button -label "Fluid Containers" - command "" -align "left";
+        			button -label "Fluid Containers" - command "" -align "left";                               //!!!
         			text -label "" -align "center";
-    			    button -label "Collision Objects" -command "" -align "right";
+    			    button -label "Collision Objects" -command "" -align "right";                              //!!!
     		    setParent ..;
     			
     		setParent ..;
             
             frameLayout -label "Action" -collapsable false -backgroundShade true -borderVisible false;
     			rowLayout -numberOfColumns 6 -adjustableColumn 4 -columnAlign3 "left" "center" "right";
-            		button -label "Generate" -command "onCreate" -align "left";
+            		button -label "Generate" -command "onDynamicCreate" -align "left";
             		text -label "";
             		button -label "Clear" -command "onClear" -align "center";
             		text -label "";
@@ -77,9 +77,9 @@ global proc makeWindow()
     		    setParent ..;
     		    
     		    rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
-            		button -label "Export Sequenece Frames" -command "" -align "left";
+            		button -label "Export Sequenece Frames" -command "" -align "left";                      //!!!
             		text -label "" -align "center";
-            		button -label "Export Fluid Simulation Data" -command "" -align "right"; 		    
+            		button -label "Export Fluid Simulation Data" -command "" -align "right"; 		        //!!!
     		    setParent ..;
     		    
     	    setParent ..;    		
@@ -159,44 +159,63 @@ global proc onStaticMesh(string $m) {
     $currNum_LS = $currNum_LS + 1;
 }
 
-/*
+
 global proc onDynamicCreate()
 {
-    global string $textbox_LS;
-    global string $iterSlider_LS;
-    global string $stepSlider_LS;
-    global string $angleSlider_LS;
     global int $currNum_LS;
+    
+    global string $massSlider;
+    global string $radiusSlider;
+    global string $viscositySlider;
+    
+    global string $timeStepSlider;
+    global string $fluidDensitySlider;
+    global string $numParticlesSlider;
+    
+    global string $widthSlider;
+    global string $heightSlider;
+    global string $depthSlider;
 
-    string $tx = `scrollField -q -tx $textbox_LS`;
-    int $iterV = `intSliderGrp -q -v $iterSlider_LS`;
-    float $stepV = `floatSliderGrp -q -v $stepSlider_LS`;
-    float $angleV = `floatSliderGrp -q -v $angleSlider_LS`;
+    float $mass = `floatSliderGrp -q -v $massSlider`;
+    float $radius = `floatSliderGrp -q -v $radiusSlider`;
+    float $viscosity = `floatSliderGrp -q -v $viscositySlider`;
+    
+    float $timeStep = `floatSliderGrp -q -v $timeStepSlider`;
+    float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
+    int $numParticles = `intSliderGrp -q -v $numParticlesSlider`;
+    
+    int $width = `intSliderGrp -q -v $widthSlider`;
+    int $height = `intSliderGrp -q -v $heightSlider`;
+    int $depth = `intSliderGrp -q -v $depthSlider`;
 
-    print("Creating a dynamic LSystem with the following inputs:");
-    printConfirmations($tx, $iterV, $stepV, $angleV);
+    print("Creating a dynamic PBFluids with the following inputs:");
+    printConfirmations($mass, $radius, $viscosity, $timeStep, $fluidDensity, $numParticles, $width, $height, $depth);
 
     // Set up names
-    string $lSysName = "LSystem" + $currNum_LS;
-    string $shapeName = "LSystemShape" + $currNum_LS;
-    string $nodeName = "LSystemNode" + $currNum_LS;
+    string $PBFluidsName = "PBFluids" + $currNum_LS;
+    string $shapeName = "PBFluidsShape" + $currNum_LS;
+    string $nodeName = "PBFluidsNode" + $currNum_LS;
 
-    createNode transform -n $lSysName;
-    string $currShape = `createNode mesh -n $shapeName -p $lSysName`;
+    createNode transform -n $PBFluidsName;
+    string $currShape = `createNode mesh -n $shapeName -p $PBFluidsName`;
     sets -add initialShadingGroup $currShape;
 
     // Adding the dynamic node
-    string $currNode = `createNode LSystemNode -n $nodeName`;
-    setAttr ($currNode + ".step") $stepV;
-    setAttr ($currNode + ".angle") $angleV;
-    setAttr ($currNode + ".time") $iterV;
-    setAttr ($currNode + ".grammar") -type "string" $tx;
+    string $currNode = `createNode MPBFluids -n $nodeName`;
+    setAttr ($currNode + ".radius") $radius;
+    setAttr ($currNode + ".density") $fluidDensity;
+    setAttr ($currNode + ".viscosity") $viscosity;
+    setAttr ($currNode + ".deltaT") $;                    //!!!
+    setAttr ($currNode + ".timeStep") $timeStep;
+    setAttr ($currNode + ".numParticles") $numParticles;
+    setAttr ($currNode + ".width") $width;
+    setAttr ($currNode + ".height") $height;
 
-    connectAttr ($currNode + ".outputMesh") ($currShape + ".inMesh");
+    connectAttr ($currNode + ".outputGeometry") ($currShape + ".inMesh");
 
     $currNum_LS = $currNum_LS + 1;
 }
-*/
+
 
 global proc changeText(string $grammar)
 {
