@@ -1,0 +1,242 @@
+global int $currNum_LS = 1;
+
+global string $massSlider;
+global string $radiusSlider;
+global string $viscositySlider;
+
+global string $timeStepSlider;
+global string $fluidDensitySlider;
+global string $numParticlesSlider;
+
+global string $widthSlider;
+global string $heightSlider;
+global string $depthSlider;
+
+global proc makeWindow() 
+{    
+    global string $massSlider;
+    global string $radiusSlider;
+    global string $viscositySlider;
+    
+    global string $timeStepSlider;
+    global string $fluidDensitySlider;
+    global string $numParticlesSlider;
+    
+    global string $widthSlider;
+    global string $heightSlider;
+    global string $depthSlider;
+
+
+    string $window = `window -title "PB Fluids"`;
+    	paneLayout -configuration "horizontal4";
+    	
+    	
+    	    frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
+    			columnLayout;
+    				$massSlider = `floatSliderGrp -label "Mass" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    				$radiusSlider = `floatSliderGrp -label "Radius" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    				$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    			setParent ..;
+    		setParent ..;
+    		
+    		frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
+    			columnLayout;
+    				$timeStepSlider = `floatSliderGrp -label "Time Step" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    				$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 100 -max 10000 -value 50 -field true`;
+    			setParent ..;
+    		setParent ..;
+    		
+    		frameLayout -label "Boundary Settings (Simulation Box)" -collapsable true -backgroundShade true -borderVisible false;
+    			columnLayout;
+    				$widthSlider = `intSliderGrp -label "Width" -min 10 -max 100 -value 1 -field true`;
+    				$heightSlider = `intSliderGrp -label "Height" -min 10 -max 100 -value 1 -field true`;
+    				$depthSlider = `intSliderGrp -label "Depth" -min 10 -max 100 -value 1 -field true`;
+    			setParent ..;
+    			
+    			rowLayout -numberOfColumns 1 -adjustableColumn 1 -columnAlign1 "left";
+    			    text -label "Or, You Can Make Selected 3D Mesh As:" -align "left";
+    			setParent ..;
+    			
+    			rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
+        			button -label "Fluid Containers" - command "" -align "left";
+        			text -label "" -align "center";
+    			    button -label "Collision Objects" -command "" -align "right";
+    		    setParent ..;
+    			
+    		setParent ..;
+            
+            frameLayout -label "Action" -collapsable false -backgroundShade true -borderVisible false;
+    			rowLayout -numberOfColumns 6 -adjustableColumn 4 -columnAlign3 "left" "center" "right";
+            		button -label "Generate" -command "onCreate" -align "left";
+            		text -label "";
+            		button -label "Clear" -command "onClear" -align "center";
+            		text -label "";
+            		button -label "Cancel" -command ("deleteUI -window " + $window) -align "right";
+            		text -label "";          		    
+    		    setParent ..;
+    		    
+    		    rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
+            		button -label "Export Sequenece Frames" -command "" -align "left";
+            		text -label "" -align "center";
+            		button -label "Export Fluid Simulation Data" -command "" -align "right"; 		    
+    		    setParent ..;
+    		    
+    	    setParent ..;    		
+    		
+    	setParent ..;
+    showWindow $window;
+}
+makeWindow();
+
+
+global proc printConfirmations(float $mass, float $radius, float $viscosity, float $timeStep, float $fluidDensity, int $numParticles, int $width, int $height, int $depth) 
+{
+    print("Mass: " + $mass + "\n");
+    print("Radius: " + $radius + "\n");
+    print("Viscosity: " + $viscosity + "\n");
+    
+    print("Time Step: " + $timeStep + "\n");
+    print("Fluid Density: " + $fluidDensity + "\n");
+    print("Num of Particles: " + $numParticles + "\n");
+    
+    print("Width: " + $width + "\n");
+    print("Height: " + $height + "\n");
+    print("Depth: " + $depth + "\n");
+    print("\n");
+}
+
+global proc onCreate()
+{
+    global int $currNum_LS;
+    
+    global string $massSlider;
+    global string $radiusSlider;
+    global string $viscositySlider;
+    
+    global string $timeStepSlider;
+    global string $fluidDensitySlider;
+    global string $numParticlesSlider;
+    
+    global string $widthSlider;
+    global string $heightSlider;
+    global string $depthSlider;
+    
+    float $mass = `floatSliderGrp -q -v $massSlider`;
+    float $radius = `floatSliderGrp -q -v $radiusSlider`;
+    float $viscosity = `floatSliderGrp -q -v $viscositySlider`;
+    
+    float $timeStep = `floatSliderGrp -q -v $timeStepSlider`;
+    float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
+    int $numParticles = `intSliderGrp -q -v $numParticlesSlider`;
+    
+    int $width = `intSliderGrp -q -v $widthSlider`;
+    int $height = `intSliderGrp -q -v $heightSlider`;
+    int $depth = `intSliderGrp -q -v $depthSlider`;
+
+    print("Running PBFluids with the following inputs:");
+    printConfirmations($mass, $radius, $viscosity, $timeStep, $fluidDensity, $numParticles, $width, $height, $depth);
+
+    // Call cmd
+    // LSystemCmd -grammar $tx -iterations $iterV -step $stepV -angle $angleV -id $currNum_LS;
+
+    $currNum_LS = $currNum_LS + 1;
+}
+
+global proc onStaticMesh(string $m) {
+    global int $currNum_LS;
+
+    // Set up names
+    string $lSysName = "LSystem" + $currNum_LS;
+    string $shapeName = "LSystemShape" + $currNum_LS;
+
+    // Set up nodes
+    createNode transform -n $lSysName;
+    string $currShape = `createNode mesh -n $shapeName -p $lSysName`;
+    sets -add initialShadingGroup $currShape;
+    setAttr ($currShape + ".inMesh") -type mesh $m;
+
+    $currNum_LS = $currNum_LS + 1;
+}
+
+/*
+global proc onDynamicCreate()
+{
+    global string $textbox_LS;
+    global string $iterSlider_LS;
+    global string $stepSlider_LS;
+    global string $angleSlider_LS;
+    global int $currNum_LS;
+
+    string $tx = `scrollField -q -tx $textbox_LS`;
+    int $iterV = `intSliderGrp -q -v $iterSlider_LS`;
+    float $stepV = `floatSliderGrp -q -v $stepSlider_LS`;
+    float $angleV = `floatSliderGrp -q -v $angleSlider_LS`;
+
+    print("Creating a dynamic LSystem with the following inputs:");
+    printConfirmations($tx, $iterV, $stepV, $angleV);
+
+    // Set up names
+    string $lSysName = "LSystem" + $currNum_LS;
+    string $shapeName = "LSystemShape" + $currNum_LS;
+    string $nodeName = "LSystemNode" + $currNum_LS;
+
+    createNode transform -n $lSysName;
+    string $currShape = `createNode mesh -n $shapeName -p $lSysName`;
+    sets -add initialShadingGroup $currShape;
+
+    // Adding the dynamic node
+    string $currNode = `createNode LSystemNode -n $nodeName`;
+    setAttr ($currNode + ".step") $stepV;
+    setAttr ($currNode + ".angle") $angleV;
+    setAttr ($currNode + ".time") $iterV;
+    setAttr ($currNode + ".grammar") -type "string" $tx;
+
+    connectAttr ($currNode + ".outputMesh") ($currShape + ".inMesh");
+
+    $currNum_LS = $currNum_LS + 1;
+}
+*/
+
+global proc changeText(string $grammar)
+{
+    global string $textbox_LS;
+    print($grammar + "\n\n");
+
+    scrollField -e -tx $grammar $textbox_LS;
+}
+
+global proc getFileData(string $parent, string $selectedFile)
+{
+    $file = `fopen $selectedFile "r"`;
+	print("Loading grammar from file:\n");
+	print($selectedFile + "\n");
+
+    string $grammar = `fread $file $grammar`;
+    changeText($grammar);
+}
+
+global proc onDialogCreate(string $parent) {}
+
+global proc showFileDialog()
+{
+	fileDialog2 
+	-fileFilter "*.txt" -dialogStyle 2 -fileMode 1 
+	-optionsUICreate "onDialogCreate" 
+	-optionsUICommit2 "getFileData";
+}
+
+global proc onClear() {
+    // Reset the scene
+    print("Scene reset button pressed...\n");
+
+    string $result = `confirmDialog -title "Clear Scene" 
+        -message "Clear and reset entire scene?"
+        -button "Yes" -button "No" 
+        -cancelButton "No"-defaultButton "No"`;
+
+    if ($result == "Yes") {
+        file -f -new;
+        print("Scene Reset\n");
+    } else warning "Reset cancelled: scene preserved\n";
+}
