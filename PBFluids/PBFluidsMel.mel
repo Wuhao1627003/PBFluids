@@ -5,6 +5,7 @@ global string $radiusSlider;
 global string $viscositySlider;
 
 global string $timeStepSlider;
+global string $deltaTSlider;
 global string $fluidDensitySlider;
 global string $numParticlesSlider;
 
@@ -19,6 +20,7 @@ global proc makeWindow()
     global string $viscositySlider;
     
     global string $timeStepSlider;
+    global string $deltaTSlider;
     global string $fluidDensitySlider;
     global string $numParticlesSlider;
     
@@ -42,6 +44,7 @@ global proc makeWindow()
     		frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
     			columnLayout;
     				$timeStepSlider = `floatSliderGrp -label "Time Step" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    				$deltaTSlider = `floatSliderGrp -label "Delta T" -min 1.0 -max 10.0 -value 1.0 -field true`;
     				$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
     				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 100 -max 10000 -value 50 -field true`;
     			setParent ..;
@@ -87,16 +90,17 @@ global proc makeWindow()
     	setParent ..;
     showWindow $window;
 }
-makeWindow();
+//makeWindow();
 
 
-global proc printConfirmations(float $mass, float $radius, float $viscosity, float $timeStep, float $fluidDensity, int $numParticles, int $width, int $height, int $depth) 
+global proc printConfirmations(float $mass, float $radius, float $viscosity, float $timeStep, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height, int $depth) 
 {
     print("Mass: " + $mass + "\n");
     print("Radius: " + $radius + "\n");
     print("Viscosity: " + $viscosity + "\n");
     
     print("Time Step: " + $timeStep + "\n");
+    print("Delta T: " + $deltaT + "\n");
     print("Fluid Density: " + $fluidDensity + "\n");
     print("Num of Particles: " + $numParticles + "\n");
     
@@ -115,6 +119,7 @@ global proc onCreate()
     global string $viscositySlider;
     
     global string $timeStepSlider;
+    global string $deltaTSlider;
     global string $fluidDensitySlider;
     global string $numParticlesSlider;
     
@@ -127,6 +132,7 @@ global proc onCreate()
     float $viscosity = `floatSliderGrp -q -v $viscositySlider`;
     
     float $timeStep = `floatSliderGrp -q -v $timeStepSlider`;
+    float $deltaT = `floatSliderGrp -q -v $deltaTSlider`;
     float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
     int $numParticles = `intSliderGrp -q -v $numParticlesSlider`;
     
@@ -135,7 +141,7 @@ global proc onCreate()
     int $depth = `intSliderGrp -q -v $depthSlider`;
 
     print("Running PBFluids with the following inputs:");
-    printConfirmations($mass, $radius, $viscosity, $timeStep, $fluidDensity, $numParticles, $width, $height, $depth);
+    printConfirmations($mass, $radius, $viscosity, $timeStep, $deltaT, $fluidDensity, $numParticles, $width, $height, $depth);
 
     // Call cmd
     // LSystemCmd -grammar $tx -iterations $iterV -step $stepV -angle $angleV -id $currNum_LS;
@@ -169,6 +175,7 @@ global proc onDynamicCreate()
     global string $viscositySlider;
     
     global string $timeStepSlider;
+    global string $deltaTSlider;
     global string $fluidDensitySlider;
     global string $numParticlesSlider;
     
@@ -181,6 +188,7 @@ global proc onDynamicCreate()
     float $viscosity = `floatSliderGrp -q -v $viscositySlider`;
     
     float $timeStep = `floatSliderGrp -q -v $timeStepSlider`;
+    float $deltaT = `floatSliderGrp -q -v $deltaTSlider`;
     float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
     int $numParticles = `intSliderGrp -q -v $numParticlesSlider`;
     
@@ -189,7 +197,7 @@ global proc onDynamicCreate()
     int $depth = `intSliderGrp -q -v $depthSlider`;
 
     print("Creating a dynamic PBFluids with the following inputs:");
-    printConfirmations($mass, $radius, $viscosity, $timeStep, $fluidDensity, $numParticles, $width, $height, $depth);
+    printConfirmations($mass, $radius, $viscosity, $timeStep, $deltaT, $fluidDensity, $numParticles, $width, $height, $depth);
 
     // Set up names
     string $PBFluidsName = "PBFluids" + $currNum_LS;
@@ -205,7 +213,7 @@ global proc onDynamicCreate()
     setAttr ($currNode + ".radius") $radius;
     setAttr ($currNode + ".density") $fluidDensity;
     setAttr ($currNode + ".viscosity") $viscosity;
-    setAttr ($currNode + ".deltaT") $;                    //!!!
+    setAttr ($currNode + ".deltaT") $deltaT;
     setAttr ($currNode + ".timeStep") $timeStep;
     setAttr ($currNode + ".numParticles") $numParticles;
     setAttr ($currNode + ".width") $width;
@@ -259,3 +267,8 @@ global proc onClear() {
         print("Scene Reset\n");
     } else warning "Reset cancelled: scene preserved\n";
 }
+
+global string $gMainWindow;
+setParent $gMainWindow;
+menu -label "PBFluids" -p $gMainWindow -tearOff on;
+menuItem -label "PBFluids Dialogue" -command ("makeWindow");
