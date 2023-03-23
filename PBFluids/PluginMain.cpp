@@ -17,7 +17,7 @@ MStatus initializePlugin(MObject obj)
 
 	// Auto-register Mel menu script
 	char buffer[2048];
-	MString pluginPath = plugin.loadPath() + MString("/") + MString("Register.mel\"");
+	MString pluginPath = plugin.loadPath() + MString("/") + MString("PBFluidsMel.mel\"");
 	MString menuPath = MString("source \"") + pluginPath;
 	sprintf_s(buffer, 2048, menuPath.asChar());
 	MGlobal::executeCommand(buffer, true);

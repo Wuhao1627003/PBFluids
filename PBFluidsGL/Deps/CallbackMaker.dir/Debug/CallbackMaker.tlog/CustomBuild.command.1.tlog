@@ -1,0 +1,10 @@
+^S:\UPENN\ONEDRIVE - PENNO365\660\AUTHORING TOOL\PBFLUIDS\PBFLUIDSGL\DEPS\FREEGLUT-3.4.0\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SS:/UPenn/OneDrive - PennO365/660/Authoring Tool/PBFluids/PBFluidsGL/Deps/freeglut-3.4.0" "-BS:/UPenn/OneDrive - PennO365/660/Authoring Tool/PBFluids/PBFluidsGL/Deps" --check-stamp-file "S:/UPenn/OneDrive - PennO365/660/Authoring Tool/PBFluids/PBFluidsGL/Deps/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
