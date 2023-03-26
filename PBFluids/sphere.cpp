@@ -2,6 +2,12 @@
 #include <maya/MMatrix.h>
 #include <math.h>
 
+
+std::string MPointToString(MPoint p)
+{
+    return (std::to_string(p.x) + "," + std::to_string(p.y) + "," + std::to_string(p.z) + "\n");
+}
+
 MPointArray SphereMesh::gPoints;
 MIntArray SphereMesh::gFaceCounts;
 MIntArray SphereMesh::gFaceConnects;
@@ -10,10 +16,7 @@ SphereMesh::SphereMesh(
    const MPoint& start, double _r) : 
     mStart(start), r(_r)
 {
-    if (gPoints.length() == 0)
-    {
-        initSphereMesh(vec3(start.x, start.y, start.z), r);
-    }
+    initSphereMesh(vec3(start.x, start.y, start.z), r);
 }
 
 SphereMesh::~SphereMesh(){}
@@ -61,11 +64,11 @@ void SphereMesh::initSphereMesh(vec3 p, double r)
 
     for (int i = 0; i < numSlices; i++)
     {
-        gPoints.append(MPoint(0.8 * r + p[0], p[1] + r * cos(angle * i), p[2] + r * sin(angle * i)));
+        gPoints.append(MPoint(0.5 * r + p[0], p[1] + r * cos(angle * i), p[2] + r * sin(angle * i)));
     }
     for (int i = 0; i < numSlices; i++)
     {
-        gPoints.append(MPoint(-0.8 * r + p[0], p[1] + r * cos(angle * i), p[2] + r * sin(angle * i)));
+        gPoints.append(MPoint(-0.5 * r + p[0], p[1] + r * cos(angle * i), p[2] + r * sin(angle * i)));
     }
     // endcap 1
     gPoints.append(MPoint(r + p[0], p[1], p[2]));

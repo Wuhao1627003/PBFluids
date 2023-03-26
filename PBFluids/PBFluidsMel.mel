@@ -46,7 +46,7 @@ global proc makeWindow()
     				$timeStepSlider = `floatSliderGrp -label "Time Step" -min 1.0 -max 10.0 -value 1.0 -field true`;
     				$deltaTSlider = `floatSliderGrp -label "Delta T" -min 1.0 -max 10.0 -value 1.0 -field true`;
     				$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
-    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 100 -max 10000 -value 50 -field true`;
+    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
     			setParent ..;
     		setParent ..;
     		

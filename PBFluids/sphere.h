@@ -10,6 +10,7 @@
 #include <maya/MVectorArray.h>
 #include <maya/MIntArray.h>
 #include <maya/MDoubleArray.h>
+#include <string>
 
 class SphereMesh
 {

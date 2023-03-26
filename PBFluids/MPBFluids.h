@@ -14,7 +14,7 @@
 #include <maya/MObject.h>
 #include <maya/MPlug.h>
 #include <maya/MFnMeshData.h>
-
+#include <maya/MGlobal.h>
 #include <maya/MIOStream.h>
 
 using namespace std;
