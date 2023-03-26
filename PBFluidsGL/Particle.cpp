@@ -2,10 +2,8 @@
 
 void Particle::preprocess(float dt)
 {
+	this->vel += vec3(0., -9.8, 0.) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
-	if (this->ID == 0) {
-		auto test = this->posPredicted;
-	}
 }
 
 void Particle::findNeighbors(const Cell &c, const vector<Particle> &particles)
@@ -20,5 +18,8 @@ void Particle::findNeighbors(const Cell &c, const vector<Particle> &particles)
 void Particle::postprocess(float dt)
 {
 	this->vel = (this->posPredicted - this->pos) / dt;
+
+	// TODO: vorticity & viscosity
+
 	this->pos = this->posPredicted;
 }

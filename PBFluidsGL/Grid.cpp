@@ -93,8 +93,15 @@ void Grid::step()
 		particles[i].findNeighbors(this->gridCells[particles[i].cellIdx], particles);
 	}
 
-	// main simulation loop
+	// TODO: main solver loop
+	for (size_t iter = 0; iter < numIter; iter++) {
+		// calculate lambdas
 
+		// update delta p and detect collision
+
+		// update positions
+
+	}
 
 #pragma omp parallel for
 	for (int i = 0; i < particles.size(); i++) {

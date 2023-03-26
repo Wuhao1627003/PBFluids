@@ -6,7 +6,7 @@
 #define kScreenHeight 480
 #define kViewWidth 10.0f
 #define kViewHeight (kScreenHeight*kViewWidth/kScreenWidth)
-#define kParticleCount 30
+#define kParticleCount 300
 #define kParticleRadius 0.05f
 
 class Render

@@ -10,7 +10,7 @@ public:
 	long ID;
 	int cellIdx;
 	vec3 pos, posPredicted;
-	vec3 vel = vec3(0.1, 0.1, 0.);
+	vec3 vel = vec3(0., 0., 0.);
 	float density, gradNorm, lambda;
 	vector<Particle> neighborParticles;
 

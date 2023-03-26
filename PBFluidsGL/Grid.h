@@ -6,6 +6,8 @@
 
 using namespace std;
 
+#define numIter 10
+
 struct Hash
 {
 	std::size_t operator()(const vec3 &v) const

@@ -25,9 +25,6 @@ void Render::render()
         colors[i].b = 0.5f + 0.5f * normalizedVel[2];
         colors[i].a = 1.f;
         positions[i].x = grid.particles[i].pos[1] / grid.width * kViewWidth;
-        if (i == 0) {
-			auto test = positions[i].x;
-		}
         positions[i].y = grid.particles[i].pos[2] / grid.height * kViewHeight;
     }
 
