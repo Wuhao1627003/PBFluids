@@ -46,7 +46,7 @@ public:
 	// initialize all properties of cells, and populate with particles
 	void initCells();
 	// update the cell that the particle is in
-	void updateParticleCell(Particle *p);
+	void updateParticleCell(Particle &p);
 	// go forward one time step for all particles and cells
 	void step();
 

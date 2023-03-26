@@ -10,7 +10,7 @@ void Grid::initCellCoordMap()
 			for (cellz = 0; cellz < height; cellz++) {
 				cellIdx = computeCellIdx(cellx, celly, cellz);
 				cellCoordMap.insert(pair<vec3, int>(vec3(cellx, celly, cellz), cellIdx));
-				this->gridCells[cellIdx] = Cell(vec3(cellx, celly, cellz), &(this->gridCells));
+				this->gridCells[cellIdx] = Cell(vec3(cellx, celly, cellz));
 			}
 		}
 	}
@@ -66,11 +66,46 @@ void Grid::initCells()
 	}
 }
 
-void Grid::updateParticleCell(Particle *p)
-{}
+void Grid::updateParticleCell(Particle &p)
+{
+	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0], (int) p.pos[1], (int) p.pos[2]));
+	if (it == cellCoordMap.end()) {
+		return;
+	}
+	int cellIdx = it->second;
+	if (p.cellIdx != cellIdx) {
+		// remove particle from old cell
+		this->gridCells[p.cellIdx].particleIDs.erase(remove(this->gridCells[p.cellIdx].particleIDs.begin(), this->gridCells[p.cellIdx].particleIDs.end(), p.ID), this->gridCells[p.cellIdx].particleIDs.end());
+		// add particle to new cell
+		this->gridCells[cellIdx].particleIDs.push_back(p.ID);
+		p.cellIdx = cellIdx;
+	}
+}
 
 void Grid::step()
 {
+#pragma omp parallel for
+	for (int i = 0; i < particles.size(); i++) {
+		particles[i].preprocess(dt);
+	}
+#pragma omp parallel for
+	for (int i = 0; i < particles.size(); i++) {
+		particles[i].findNeighbors(this->gridCells[particles[i].cellIdx], particles);
+	}
+
+	// main simulation loop
+
+
+#pragma omp parallel for
+	for (int i = 0; i < particles.size(); i++) {
+		particles[i].postprocess(dt);
+		updateParticleCell(particles[i]);
+	}
+
+#pragma omp parallel for
+	for (int i = 0; i < gridCells.size(); i++) {
+		gridCells[i].updateNeighbors(gridCells);
+	}
 
 	glutPostRedisplay();
 }

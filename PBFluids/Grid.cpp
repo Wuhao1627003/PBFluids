@@ -65,7 +65,7 @@ void Grid::initCells()
 	}
 }
 
-void Grid::updateParticleCell(Particle *p)
+void Grid::updateParticleCell(Particle &p)
 {}
 
 void Grid::step()

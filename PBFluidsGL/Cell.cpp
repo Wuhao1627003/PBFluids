@@ -1,10 +1,10 @@
 #include "Cell.h"
 
-void Cell::updateNeighbors()
+void Cell::updateNeighbors(const vector<Cell> &gridCellsPtr)
 {
 	this->neighborParticleIDs.clear();
 	for (int neighborCellIdx : this->neighborCellIdxs) {
-		Cell neighborCell = (*(this->gridCellsPtr))[neighborCellIdx];
-		this->neighborParticleIDs.insert(this->neighborParticleIDs.end(), neighborCell.neighborParticleIDs.begin(), neighborCell.neighborParticleIDs.end());
+		Cell neighborCell = gridCellsPtr[neighborCellIdx];
+		this->neighborParticleIDs.insert(this->neighborParticleIDs.end(), neighborCell.particleIDs.begin(), neighborCell.particleIDs.end());
 	}
 }

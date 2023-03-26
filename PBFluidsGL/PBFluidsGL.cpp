@@ -1,7 +1,6 @@
 #include "Render.h"
 #include <functional>
 
-Grid grid;
 Render r;
 
 void Display()
@@ -11,13 +10,12 @@ void Display()
 
 void Step()
 {
-    grid.step();
+    r.grid.step();
 }
 
 int main(int argc, char **argv)
 {
-    grid = Grid(20, 15, 0.5, 0, kParticleCount, 0.5, kParticleRadius);
-    r.setGrid(grid);
+    r.setGrid(Grid(20, 15, 0.5, 0, kParticleCount, 0.5, kParticleRadius));
 
     glutInitWindowSize(kScreenWidth, kScreenHeight);
     glutInit(&argc, argv);
