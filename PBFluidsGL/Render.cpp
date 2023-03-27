@@ -1,8 +1,8 @@
 #include "Render.h"
 
-void Render::setGrid(const Grid &inGrid)
+void Render::setGrid()
 {
-    grid = inGrid;
+    this->grid = new Grid(20, 10, 0.5, 0, kParticleCount, 0.2, kParticleRadius);
 }
 
 void Render::render()
@@ -19,13 +19,16 @@ void Render::render()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     for (size_t i = 0; i < kParticleCount; ++i) {
-        vec3 normalizedVel = grid.particles[i].vel.Normalize();
-        colors[i].r = 0.5f + 0.5f * normalizedVel[0];
+        vec3 normalizedVel = grid->particles[i].vel.Normalize();
+        /*colors[i].r = 0.5f + 0.5f * normalizedVel[0];
         colors[i].g = 0.5f + 0.5f * normalizedVel[1];
-        colors[i].b = 0.5f + 0.5f * normalizedVel[2];
+        colors[i].b = 0.5f + 0.5f * normalizedVel[2];*/
+        colors[i].r = 0.7f;
+        colors[i].g = 0.2f;
+        colors[i].b = 0.2f;
         colors[i].a = 1.f;
-        positions[i].x = grid.particles[i].pos[1] / grid.width * kViewWidth;
-        positions[i].y = grid.particles[i].pos[2] / grid.height * kViewHeight;
+        positions[i].x = grid->particles[i].pos[1] / grid->width * kViewWidth;
+        positions[i].y = grid->particles[i].pos[2] / grid->height * kViewHeight;
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
