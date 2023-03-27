@@ -4,7 +4,6 @@
 #include "kernel.h"
 #include <unordered_map>
 #include <string>
-#include <Eigen/Dense>
 
 using namespace std;
 
@@ -73,11 +72,8 @@ private:
 	Eigen::VectorXd lambda; // constraint lagrange
 	Eigen::VectorXd c_grad_norm; // constraint grad norm
 
-	// Global State Parameters
-	Eigen::MatrixXd x_new; // position prediction updated on every Jacobi iteration
-
-	Eigen::Vector3d ker_res; // stores spiky kernel 3-vector 
-	Eigen::Vector3d c_grad_temp; // stores cumulative gradient magnitude
+	vec3 ker_res; // stores spiky kernel 3-vector 
+	vec3 c_grad_temp; // stores cumulative gradient magnitude
 
 	int computeCellIdx(int cellx, int celly, int cellz);
 };

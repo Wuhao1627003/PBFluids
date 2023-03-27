@@ -11,7 +11,7 @@ public:
 	int cellIdx;
 	vec3 pos, posPredicted;
 	vec3 vel = vec3(0., 0., 0.);
-	float density, gradNorm, lambda;
+	float density, gradNorm, lambda, constraint;
 
 	Particle() {};
 	Particle(long ID, int cellIdx, const vec3 &pos, float density) : ID(ID), cellIdx(cellIdx), pos(pos), density(density) {};
