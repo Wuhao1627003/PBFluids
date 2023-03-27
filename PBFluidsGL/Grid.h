@@ -1,12 +1,16 @@
 #pragma once
 #include "Cell.h"
 #include "Particle.h"
+#include "kernel.h"
 #include <unordered_map>
 #include <string>
+#include <Eigen/Dense>
 
 using namespace std;
 
 #define numIter 10
+#define particleMass 1;
+#define jacobiIterations 4;
 
 struct Hash
 {
@@ -32,6 +36,10 @@ public:
 	int width, height;
 	long numParticles;
 	float radius;
+
+	double kernel_h = 0.1;
+	double rho = 10000.0; // Rest density
+	double cfm_epsilon = 60.0; // Constraint Force Mixing Relaxation
 		
 	Grid() {};
 	Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius):
@@ -56,6 +64,19 @@ private:
 	float density, dt, viscosity;
 	// map of cell coordinates to cell index
 	unordered_map<vec3, int, Hash> cellCoordMap;
+
+	// Jacobi Loop Parameters
+	Eigen::MatrixXd dP; // position correction
+	Eigen::VectorXd density; // fluid density
+	Eigen::VectorXd c; // constraint equation
+	Eigen::VectorXd lambda; // constraint lagrange
+	Eigen::VectorXd c_grad_norm; // constraint grad norm
+
+	// Global State Parameters
+	Eigen::MatrixXd x_new; // position prediction updated on every Jacobi iteration
+
+	Eigen::Vector3d ker_res; // stores spiky kernel 3-vector 
+	Eigen::Vector3d c_grad_temp; // stores cumulative gradient magnitude
 
 	int computeCellIdx(int cellx, int celly, int cellz);
 };

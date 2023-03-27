@@ -96,6 +96,39 @@ void Grid::step()
 	// TODO: main solver loop
 	for (size_t iter = 0; iter < numIter; iter++) {
 		// calculate lambdas
+		for (int i = 0; i < jacobiIterations; i++) {
+
+			// reset jacobi state
+			density.setZero();
+			lambda.setZero();
+			c_grad_norm.setZero();
+			dP.setZero();
+
+			// ----------- Computed Constraints ---------
+			for (int p_i = 0; p_i < particles.size(); p_i++) {
+				for (int p_j = 0; p_j < particles[p_i].neighborParticles.size(); p_j++) {
+					density[p_i] += particleMass * kernel_poly6(x_new.row(p_i), x_new.row(p_j), kernel_h);
+
+					// accumulate gradient norm
+					c_grad_temp.setZero();
+					if (p_i == p_j) {
+						for (auto p_k : neighbours[p_i]) {
+							kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_k), kernel_h);
+							c_grad_temp += ker_res;
+						}
+					}
+					else {
+						kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_j), kernel_h);
+						c_grad_temp = ker_res;
+					}
+
+					c_grad_norm[p_i] += (c_grad_temp / rho).norm();
+				}
+
+				// Compute constraint and lambda
+				c[p_i] = (density[p_i] / rho) - 1;
+				lambda[p_i] = -c[p_i] / (c_grad_norm[p_i] + cfm_epsilon);
+			}
 
 		// update delta p and detect collision
 
