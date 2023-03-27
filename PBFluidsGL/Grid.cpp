@@ -101,21 +101,6 @@ void Grid::step()
 		for (int i = 0; i < particles.size(); i++) {
 			particles[i].reset();
 		}
-
-		// reset jacobi state
-			for (auto p : particles)
-			{
-				p.density = 0;
-				p.lambda = 0;
-				p.gradNorm = 0;
-			}
-
-			/*
-			density.setZero();
-			lambda.setZero();
-			c_grad_norm.setZero();
-			dP.setZero();
-			*/
 			
 		// ----------- Computed Constraints ---------
 		for (long p_i = 0; p_i < particles.size(); p_i++) {
