@@ -29,6 +29,7 @@ class Grid
 public:
 	vector<Cell> gridCells;
 	vector<Particle> particles;
+	vector<vector<long>> allNeighborIDs;
 	int width, height;
 	long numParticles;
 	float radius;

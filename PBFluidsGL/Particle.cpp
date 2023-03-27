@@ -2,17 +2,13 @@
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., -9.8, 0.) * dt;
+	this->vel += vec3(0., 0., -2) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 
-void Particle::findNeighbors(const Cell &c, const vector<Particle> &particles)
+vector<long> Particle::findNeighborIDs(const Cell &c, const vector<Particle> &particles)
 {
-	this->neighborParticles.clear();
-	this->neighborParticles.resize(c.neighborParticleIDs.size());
-	for (int i = 0; i < c.neighborParticleIDs.size(); i++) {
-		this->neighborParticles[i] = particles[c.neighborParticleIDs[i]];
-	}
+	return c.neighborParticleIDs;
 }
 
 void Particle::postprocess(float dt)

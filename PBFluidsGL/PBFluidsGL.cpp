@@ -15,7 +15,7 @@ void Step()
 
 int main(int argc, char **argv)
 {
-    r.setGrid(Grid(20, 15, 0.5, 0, kParticleCount, 0.5, kParticleRadius));
+    r.setGrid(Grid(20, 10, 0.5, 0, kParticleCount, 0.1, kParticleRadius));
 
     glutInitWindowSize(kScreenWidth, kScreenHeight);
     glutInit(&argc, argv);
