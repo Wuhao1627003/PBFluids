@@ -19,6 +19,7 @@ void Grid::initCellCoordMap()
 void Grid::initParticles()
 {
 	this->particles.resize(numParticles);
+	this->allNeighborIDs.resize(numParticles);
 	float x, y, z;
 	int cellIdx;
 	for (long particleID = 0; particleID < numParticles; particleID++) {
@@ -90,7 +91,7 @@ void Grid::step()
 	}
 #pragma omp parallel for
 	for (int i = 0; i < particles.size(); i++) {
-		particles[i].findNeighbors(this->gridCells[particles[i].cellIdx], particles);
+		allNeighborIDs[i] = particles[i].findNeighborIDs(this->gridCells[particles[i].cellIdx], particles);
 	}
 
 	// TODO: main solver loop
@@ -139,6 +140,9 @@ void Grid::step()
 #pragma omp parallel for
 	for (int i = 0; i < particles.size(); i++) {
 		particles[i].postprocess(dt);
+	}
+
+	for (int i = 0; i < particles.size(); i++) {
 		updateParticleCell(particles[i]);
 	}
 
