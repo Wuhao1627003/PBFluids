@@ -2,13 +2,21 @@
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., 0., -2) * dt;
+	this->vel += vec3(0., 0., -0.1) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 
 vector<long> Particle::findNeighborIDs(const Cell &c, const vector<Particle> &particles)
 {
 	return c.neighborParticleIDs;
+}
+
+void Particle::reset()
+{
+	this->density = 0.;
+	this->gradNorm = 0.;
+	this->lambda = 0.;
+	this->deltaP = vec3(0., 0., 0.);
 }
 
 void Particle::postprocess(float dt)

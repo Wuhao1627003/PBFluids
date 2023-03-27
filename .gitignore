@@ -9,3 +9,5 @@ PBFluidsGL/Deps2/*
 PBFluidsGL/Debug/*
 PBFluidsGL/.vs/*
 PBFluidsGL/freeglutd.dll
+PBFluidsGL/PBFluidsGL.vcxproj
+PBFluidsGL/PBFluidsGL.vcxproj.user

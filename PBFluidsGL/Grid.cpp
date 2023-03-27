@@ -27,7 +27,7 @@ void Grid::initParticles()
 		y = (float)rand() / RAND_MAX * width;
 		z = (float)rand() / RAND_MAX * height;
 		cellIdx = cellCoordMap.find(vec3((int) x, (int) y, (int) z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x, y, z), density);
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x, y, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -97,43 +97,48 @@ void Grid::step()
 	// TODO: main solver loop
 	for (size_t iter = 0; iter < numIter; iter++) {
 		// calculate lambdas
-		for (int i = 0; i < jacobiIterations; i++) {
+#pragma omp parallel for
+		for (int i = 0; i < particles.size(); i++) {
+			particles[i].reset();
+		}
 
-			// reset jacobi state
-			density.setZero();
-			lambda.setZero();
-			c_grad_norm.setZero();
-			dP.setZero();
+		// ----------- Computed Constraints ---------
+		for (long p_i = 0; p_i < particles.size(); p_i++) {
+			vector<long> neighbours = allNeighborIDs[p_i];
+			for (long p_j : neighbours) {
+				particles[p_i].density += particleMass * kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted);
 
-			// ----------- Computed Constraints ---------
-			for (int p_i = 0; p_i < particles.size(); p_i++) {
-				for (int p_j = 0; p_j < particles[p_i].neighborParticles.size(); p_j++) {
-					density[p_i] += particleMass * kernel_poly6(x_new.row(p_i), x_new.row(p_j), kernel_h);
-
-					// accumulate gradient norm
-					c_grad_temp.setZero();
-					if (p_i == p_j) {
-						for (auto p_k : neighbours[p_i]) {
-							kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_k), kernel_h);
-							c_grad_temp += ker_res;
-						}
+				// accumulate gradient norm
+				vec3 gradTemp = vec3(0, 0, 0);
+				if (p_i == p_j) {
+					for (long p_k : neighbours) {
+						gradTemp += kernel_spiky(particles[p_i].posPredicted, particles[p_k].posPredicted);
 					}
-					else {
-						kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_j), kernel_h);
-						c_grad_temp = ker_res;
-					}
-
-					c_grad_norm[p_i] += (c_grad_temp / rho).norm();
+				}
+				else {
+					gradTemp = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted);
 				}
 
-				// Compute constraint and lambda
-				c[p_i] = (density[p_i] / rho) - 1;
-				lambda[p_i] = -c[p_i] / (c_grad_norm[p_i] + cfm_epsilon);
+				particles[p_i].gradNorm += (gradTemp / this->density).Length();
 			}
 
-		// update delta p and detect collision
+			// Compute constraint and lambda
+			double constraintVal = (particles[p_i].density / this->density) - 1;
+			particles[p_i].lambda = -constraintVal / (particles[p_i].gradNorm + cfmEpsilon);
+		}
 
-		// update positions
+		// update delta p
+		for (int p_i = 0; p_i < particles.size(); p_i++) {
+			for (int p_j : allNeighborIDs[p_i]) {
+				vec3 spikyKernel = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted);
+				float s_corr = -kTensile * pow(kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted), nTensile) / tensileStabilityDenom;
+				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
+			}
+			particles[p_i].deltaP /= this->density;
+			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP;
+		}
+
+		// TODO: collision detection
 
 	}
 

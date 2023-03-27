@@ -10,12 +10,12 @@ void Display()
 
 void Step()
 {
-    r.grid.step();
+    r.grid->step();
 }
 
 int main(int argc, char **argv)
 {
-    r.setGrid(Grid(20, 10, 0.5, 0, kParticleCount, 0.1, kParticleRadius));
+    r.setGrid();
 
     glutInitWindowSize(kScreenWidth, kScreenHeight);
     glutInit(&argc, argv);

@@ -24,9 +24,9 @@ public:
 	};
 	Position positions[kParticleCount];
 
-	Grid grid;
+	Grid *grid;
 
 	Render() {};
 	void render();
-	void setGrid(const Grid &inGrid);
+	void setGrid();
 };
