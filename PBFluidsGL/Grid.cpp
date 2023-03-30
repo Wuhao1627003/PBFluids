@@ -127,6 +127,7 @@ void Grid::step()
 			particles[p_i].lambda = -constraintVal / (particles[p_i].gradNorm + cfmEpsilon);
 		}
 
+		// ----------- Computed Position Correction ---------
 		// update delta p
 		for (int p_i = 0; p_i < particles.size(); p_i++) {
 			for (int p_j : allNeighborIDs[p_i]) {
