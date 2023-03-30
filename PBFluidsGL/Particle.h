@@ -1,6 +1,7 @@
 #pragma once
 #include "Utils/vec.h"
 #include "Cell.h"
+#include "kernel.h"
 #include <vector>
 using namespace std;
 
@@ -12,6 +13,7 @@ public:
 	vec3 pos, posPredicted, deltaP;
 	vec3 vel = vec3(0., 0., 0.);
 	float density, gradNorm, lambda, constraint;
+	vec3 omega, eta, N;
 
 	Particle() {};
 	Particle(long ID, int cellIdx, const vec3 &pos) : ID(ID), cellIdx(cellIdx), pos(pos) {};
@@ -23,6 +25,6 @@ public:
 	// reset intermediate values
 	void reset();
 	// update velocity and position
-	void postprocess(float dt);
+	void postprocess(float dt, vector<long> neighborIDs, vector<Particle>& particles);
 };
 

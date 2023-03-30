@@ -19,47 +19,45 @@ void Particle::reset()
 	this->deltaP = vec3(0., 0., 0.);
 }
 
-void Particle::postprocess(float dt)
+void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>& particles)
 {
 	this->vel = (this->posPredicted - this->pos) / dt;
 
 	// TODO: vorticity & viscosity
 
 	// ----------- Computed Vorticity ---------
-    Eigen::Vector3d ker_res, v_ji, N_i, omega_i; // for cross product
+    vec3 v_ji, vorticity_f;
 
-    int num_particles = x_new.rows();
-    omega.setZero();
-    eta.setZero();
-    N.setZero();
+    this->omega = vec3(0., 0., 0.);
+    this->eta = vec3(0., 0., 0.);
+    this->N = vec3(0., 0., 0.);
 
     // Compute curl
-    for (int p_i = 0; p_i < num_particles; p_i++) {
-        for (int p_j : neighbours[p_i]) {
-            kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_j), kernel_h);
-            v_ji = v.row(p_j) - v.row(p_i);
-            omega.row(p_i) += (v_ji).cross(ker_res);
-        }
+    for (int p_j : neighborIDs) {
+        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted);
+        v_ji = particles[p_j].vel - this->vel;
+        this->omega += v_ji.Cross(ker_res);
     }
 
     // Compute differential operator norm
-    for (int p_i = 0; p_i < num_particles; p_i++) {
-        for (int p_j : neighbours[p_i]) {
-            kernel_spiky(ker_res, x_new.row(p_i), x_new.row(p_j), kernel_h);
-            eta.row(p_i) += omega.row(p_j).norm() * ker_res;
-        }
-        if (eta.row(p_i).norm() > 0) {
-            N.row(p_i) = eta.row(p_i) / eta.row(p_i).norm();
-        }
-        N_i = N.row(p_i);
-        omega_i = omega.row(p_i);
-        vorticity_f.row(p_i) = vorticity_epsilon * (N_i).cross(omega_i);
+    for (int p_j : neighborIDs) {
+        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted);
+        this->eta += particles[p_j].omega.Length() * ker_res;
     }
+    if (this->eta.Length() > 0) {
+        this->N = this->eta.Normalize();
+    }
+    vorticity_f = 0.0001 * (this->N).Cross(this->omega);
 
     // Update with force due to vorticity
     this->vel += dt * vorticity_f;
 
 	// ----------- Computed Viscosity ---------
+    vec3 v_new = this->vel;
+    for (int p_j : neighborIDs) {
+        v_new += 0.0001 * kernel_poly6(this->posPredicted, particles[p_j].posPredicted) * (particles[p_j].vel - this->vel);
+    }
+    this->vel = v_new;
 
 	this->pos = this->posPredicted;
 }

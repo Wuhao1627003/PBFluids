@@ -145,7 +145,7 @@ void Grid::step()
 
 #pragma omp parallel for
 	for (int i = 0; i < particles.size(); i++) {
-		particles[i].postprocess(dt);
+		particles[i].postprocess(dt, allNeighborIDs[i], particles);
 	}
 
 	for (int i = 0; i < particles.size(); i++) {
