@@ -2,7 +2,7 @@
 
 void Render::setGrid()
 {
-    this->grid = new Grid(20, 10, 0.5, 0, kParticleCount, 0.2, kParticleRadius);
+    this->grid = new Grid(20, 10, 0.5, 0, kParticleCount, 0.1, kParticleRadius);
 }
 
 void Render::render()
@@ -12,7 +12,8 @@ void Render::render()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, kViewWidth, 0, kViewHeight, 0, 1);
+    //gluPerspective(60.0, (GLfloat) kViewWidth / (GLfloat) kViewHeight, 0.01, 1000.0);
+    glOrtho(0, kViewWidth, 0, kViewHeight, 0, kViewWidth);
 
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_BLEND);
@@ -27,8 +28,9 @@ void Render::render()
         colors[i].g = 0.2f;
         colors[i].b = 0.2f;
         colors[i].a = 1.f;
-        positions[i].x = grid->particles[i].pos[1] / grid->width * kViewWidth;
-        positions[i].y = grid->particles[i].pos[2] / grid->height * kViewHeight;
+        positions[i].x = grid->particles[i].pos[0] / grid->width * kViewWidth;
+        positions[i].y = grid->particles[i].pos[1] / grid->width * kViewWidth;
+        //positions[i].z = grid->particles[i].pos[2] / grid->height * kViewHeight;
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);

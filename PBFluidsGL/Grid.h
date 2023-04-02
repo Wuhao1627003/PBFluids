@@ -8,7 +8,7 @@
 using namespace std;
 
 #define numIter 10
-#define particleMass 1.0
+#define particleMass 3.0
 #define cfmEpsilon 60.0    // Constraint Force Mixing Relaxation
 #define kTensile 0.1
 #define nTensile 4

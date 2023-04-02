@@ -101,7 +101,7 @@ void Grid::step()
 		for (int i = 0; i < particles.size(); i++) {
 			particles[i].reset();
 		}
-			
+
 		// ----------- Computed Constraints ---------
 		for (long p_i = 0; p_i < particles.size(); p_i++) {
 			vector<long> neighbours = allNeighborIDs[p_i];
@@ -129,6 +129,7 @@ void Grid::step()
 
 		// ----------- Computed Position Correction ---------
 		// update delta p
+#pragma omp parallel for
 		for (int p_i = 0; p_i < particles.size(); p_i++) {
 			for (int p_j : allNeighborIDs[p_i]) {
 				vec3 spikyKernel = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted);
@@ -139,8 +140,55 @@ void Grid::step()
 			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP;
 		}
 
-		// TODO: collision detection
+		// collision with container
+#pragma omp parallel for
+		for (int i = 0; i < particles.size(); i++) {
+			if (gridCells[particles[i].cellIdx].isBoundary) {
+				int index = 0;
+				if (particles[i].posPredicted[0] < radius) {
+					particles[i].posPredicted[0] = radius;
+				}
+				else if (particles[i].posPredicted[0] > width - radius) {
+					particles[i].posPredicted[0] = width - radius;
+				}
+				else if (particles[i].posPredicted[1] < radius) {
+					particles[i].posPredicted[1] = radius;
+					index = 1;
+				}
+				else if (particles[i].posPredicted[1] > width - radius) {
+					particles[i].posPredicted[1] = width - radius;
+					index = 1;
+				}
+				else if (particles[i].posPredicted[2] < radius) {
+					particles[i].posPredicted[2] = radius;
+					index = 2;
+				}
+				else {
+					continue;
+				}
+				particles[i].numBounces++;
+				particles[i].vel[index] *= -5. / particles[i].numBounces;
+				particles[i].posPredicted += particles[i].vel * dt / numIter;
+			}
+		}
 
+		// collision with other particles
+		for (long p_i = 0; p_i < particles.size(); p_i++) {
+			vector<long> neighbours = allNeighborIDs[p_i];
+#pragma omp parallel for
+			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
+				long p_j = neighbours[p_jIdx];
+				if (p_i >= p_j) continue;
+				if (Distance(particles[p_i].posPredicted, particles[p_j].posPredicted) < 2 * radius) {
+					vec3 normal = particles[p_i].posPredicted - particles[p_j].posPredicted;
+					normal = normal.Normalize();
+					particles[p_i].vel = particles[p_i].vel.Length() * normal;
+					particles[p_j].vel = -particles[p_j].vel.Length() * normal;
+					particles[p_i].posPredicted += particles[p_i].vel * dt;
+					particles[p_j].posPredicted += particles[p_j].vel * dt;
+				}
+			}
+		}
 	}
 
 #pragma omp parallel for

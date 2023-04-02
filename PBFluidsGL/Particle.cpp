@@ -2,7 +2,7 @@
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., 0., -0.1) * dt;
+	this->vel += vec3(0., 0., -10) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 
@@ -23,8 +23,6 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
 {
 	this->vel = (this->posPredicted - this->pos) / dt;
 
-	// TODO: vorticity & viscosity
-
 	// ----------- Computed Vorticity ---------
     vec3 v_ji, vorticity_f;
 
@@ -40,7 +38,7 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
     }
 
     // Compute differential operator norm
-    for (int p_j : neighborIDs) {
+    for (long p_j : neighborIDs) {
         vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted);
         this->eta += particles[p_j].omega.Length() * ker_res;
     }
@@ -54,7 +52,7 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
 
 	// ----------- Computed Viscosity ---------
     vec3 v_new = this->vel;
-    for (int p_j : neighborIDs) {
+    for (long p_j : neighborIDs) {
         v_new += 0.0001 * kernel_poly6(this->posPredicted, particles[p_j].posPredicted) * (particles[p_j].vel - this->vel);
     }
     this->vel = v_new;
