@@ -12,13 +12,10 @@ public:
 	vector<long> particleIDs;
 	vector<long> neighborParticleIDs;
 	vector<int> neighborCellIdxs;
-	// whether this cell is a boundary cell
-	bool isBoundary;
-	vector<Cell>* gridCellsPtr;
 
 	Cell() {};
-	Cell(const vec3 &cellCoord, vector<Cell> *gridCellsPtr) : cellCoord(cellCoord), gridCellsPtr(gridCellsPtr) {};
+	Cell(const vec3 &cellCoord) : cellCoord(cellCoord) {};
 	// update the neighbor particles of this cell
-	void updateNeighbors();
+	void updateNeighbors(const vector<Cell> &gridCellsPtr);
 };
 

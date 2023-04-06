@@ -1,10 +1,17 @@
 #pragma once
 #include "Cell.h"
 #include "Particle.h"
+#include "kernel.h"
 #include <unordered_map>
 #include <string>
 
 using namespace std;
+
+#define numIter 10
+#define particleMass 1.0
+#define cfmEpsilon 60.0    // Constraint Force Mixing Relaxation
+#define kTensile 0.1
+#define nTensile 4
 
 struct Hash
 {
@@ -27,6 +34,7 @@ class Grid
 public:
 	vector<Cell> gridCells;
 	vector<Particle> particles;
+	vector<vector<long>> allNeighborIDs;
 	int width, height;
 	long numParticles;
 	float radius;
@@ -39,6 +47,20 @@ public:
 		initParticles();
 		initCells();
 	};
+	void operator=(const Grid &g)
+	{
+		this->width = g.width;
+		this->height = g.height;
+		this->density = g.density;
+		this->viscosity = g.viscosity;
+		this->dt = g.dt;
+		this->radius = g.radius;
+		this->numParticles = g.numParticles;
+		this->gridCells = g.gridCells;
+		this->particles = g.particles;
+		this->allNeighborIDs = g.allNeighborIDs;
+		this->cellCoordMap = g.cellCoordMap;
+	}
 	// initialize cellCoordMap
 	void initCellCoordMap();
 	// initialize all properties of particles
@@ -54,6 +76,7 @@ private:
 	float density, dt, viscosity;
 	// map of cell coordinates to cell index
 	unordered_map<vec3, int, Hash> cellCoordMap;
+	const float tensileStabilityDenom = pow(kernel_poly6(0.2), nTensile);
 
 	int computeCellIdx(int cellx, int celly, int cellz);
 };

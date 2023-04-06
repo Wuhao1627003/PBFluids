@@ -4,6 +4,8 @@
 
 MObject MPBFluids::inputObjects[9];
 MTypeId MPBFluids::id(0x80080);
+bool MPBFluids::gridInitialized(false);
+int MPBFluids::lastTime(0);
 
 MString MPointToMString(MPoint p)
 {
@@ -40,6 +42,8 @@ MStatus MPBFluids::initialize()
 		returnStatus = attributeAffects(inputObjects[objCount], inputObjects[8]);
 		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attributeAffects\n");
 	}
+	gridInitialized = false;
+	lastTime = 0;
 	MGlobal::displayInfo("Finish init");
 	return returnStatus;
 }
@@ -80,14 +84,26 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
 
-		Grid grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
-		/*for (int t = 0; t < time; t++) {
-			grid.step();
-		}*/
+		if (!gridInitialized || time == lastTime) {
+			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
+			gridInitialized = true;
+		}
+		if (lastTime < time) {
+			for (int t = lastTime; t < time; t++) {
+				grid.step();
+			}
+		}
+		else {
+			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
+			for (int t = 0; t < time; t++) {
+				grid.step();
+			}
+		}
+		lastTime = time;
 
 		std::vector<MPoint> worldPositions;
 		for (Particle p : grid.particles) {
-			MPoint particlePos = MPoint(p.pos[0], p.pos[1], p.pos[2]);
+			MPoint particlePos = MPoint(p.pos[0], p.pos[2], p.pos[1]);
 			worldPositions.push_back(particlePos);
 		}
 

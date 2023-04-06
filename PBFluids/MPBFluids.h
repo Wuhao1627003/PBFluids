@@ -40,5 +40,8 @@ public:
 	// radius, density, viscosity, dt, time, numParticles, width, height, outputGeometry;
 	static MObject inputObjects[9];
 	static MTypeId id;
+	Grid grid;
+	static bool gridInitialized;
+	static int lastTime;
 };
 
