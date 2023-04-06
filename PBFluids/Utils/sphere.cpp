@@ -54,7 +54,7 @@ void SphereMesh::getMesh(
 
 void SphereMesh::initSphereMesh(vec3 p, double r)
 {
-    int numSlices = 10;
+    int numSlices = 3;
     double angle = M_PI*2/numSlices;
 
     // Add points

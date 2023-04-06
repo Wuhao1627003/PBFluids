@@ -1,7 +1,7 @@
 #ifndef sphere_H_
 #define sphere_H_
 
-#include "Utils/vec.h"
+#include "vec.h"
 
 #include <maya/MPoint.h>
 #include <maya/MPoint.h>

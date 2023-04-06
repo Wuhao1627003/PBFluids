@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Grid.h"
-#include "sphere.h"
+#include "Utils/sphere.h"
 
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnTypedAttribute.h>
@@ -40,5 +40,8 @@ public:
 	// radius, density, viscosity, dt, time, numParticles, width, height, outputGeometry;
 	static MObject inputObjects[9];
 	static MTypeId id;
+	Grid grid;
+	static bool gridInitialized;
+	static int lastTime;
 };
 
