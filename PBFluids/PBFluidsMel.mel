@@ -1,5 +1,7 @@
 global int $currNum_LS = 1;
 
+global string $nameObj_RN;
+
 global string $massSlider;
 global string $radiusSlider;
 global string $viscositySlider;
@@ -15,6 +17,8 @@ global string $depthSlider;
 
 global proc makeWindow() 
 {    
+    global string $nameObj_RN;
+    
     global string $massSlider;
     global string $radiusSlider;
     global string $viscositySlider;
@@ -57,12 +61,19 @@ global proc makeWindow()
     				$depthSlider = `intSliderGrp -label "Depth" -min 10 -max 100 -value 1 -field true`;
     			setParent ..;
     			
+    			rowLayout -numberOfColumns 4 -adjustableColumn 1;
+        			$nameObj_RN = `textField`;
+                    text -label ", ";
+                    button -label "Selected Mesh" -command "getSelectedMesh";
+                    text -label "";
+        		setParent ..;
+        			
     			rowLayout -numberOfColumns 1 -adjustableColumn 1 -columnAlign1 "left";
     			    text -label "Or, You Can Make Selected 3D Mesh As:" -align "left";
     			setParent ..;
     			
     			rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
-        			button -label "Fluid Containers" - command "" -align "left";                               //!!!
+        			button -label "Fluid Containers" - command "triangulateMesh" -align "left";                               //!!!
         			text -label "" -align "center";
     			    button -label "Collision Objects" -command "" -align "right";                              //!!!
     		    setParent ..;
@@ -92,6 +103,38 @@ global proc makeWindow()
 }
 //makeWindow();
 
+global proc getSelectedMesh() 
+{
+    global string $nameObj_RN;
+
+    string $selected[] = `ls -selection`;
+    int $listSize = `size $selected`;
+
+    if ($listSize == 1) {
+        textField -e -tx $selected[0] $nameObj_RN;
+        print($selected[0] + "\n");
+    }
+    else if ($listSize > 1) {
+        textField -e -tx "Choose One" $nameObj_RN;
+        print("Multiple Selected\n");
+    }
+    else {
+        textField -e -tx "None" $nameObj_RN;
+        print("None Selected\n");
+    }
+}
+
+global proc triangulateMesh()
+{
+    global string $nameObj_RN;
+    
+    string $meshName = `textField -q -tx $nameObj_RN`;
+
+    if(`objExists $meshName`) 
+    {
+        polyTriangulate -ch 1 $meshName;
+    }
+}
 
 global proc printConfirmations(float $mass, float $radius, float $viscosity, float $timeStep, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height, int $depth) 
 {
