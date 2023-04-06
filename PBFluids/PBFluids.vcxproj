@@ -145,7 +145,9 @@
     <ClCompile Include="MPBFluids.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PluginMain.cpp" />
-    <ClCompile Include="sphere.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Utils\sphere.cpp" />
+    <ClCompile Include="Utils\Triangle.cpp" />
     <ClCompile Include="Utils\vec.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +156,9 @@
     <ClInclude Include="kernel.h" />
     <ClInclude Include="MPBFluids.h" />
     <ClInclude Include="Particle.h" />
-    <ClInclude Include="sphere.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Utils\sphere.h" />
+    <ClInclude Include="Utils\Triangle.h" />
     <ClInclude Include="Utils\vec.h" />
   </ItemGroup>
   <ItemGroup>

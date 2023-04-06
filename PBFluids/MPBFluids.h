@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Grid.h"
-#include "sphere.h"
+#include "Utils/sphere.h"
 
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnTypedAttribute.h>
