@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-MObject MPBFluids::inputObjects[9];
+MObject MPBFluids::inputObjects[10];
 MTypeId MPBFluids::id(0x80080);
 bool MPBFluids::gridInitialized(false);
 int MPBFluids::lastTime(0);
@@ -31,15 +31,17 @@ MStatus MPBFluids::initialize()
 	inputObjects[6] = uattr.create("width", "w", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
 	inputObjects[7] = uattr.create("height", "h", MFnUnitAttribute::Type::kTime, 0, &returnStatus);
 
-	inputObjects[8] = tattr.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
+	inputObjects[8] = tattr.create("container", "c", MFnData::kMesh, MObject::kNullObj, &returnStatus);
 
-	for (size_t objCount = 0; objCount < 9; objCount ++) {
+	inputObjects[9] = tattr.create("outputGeometry", "o", MFnData::kMesh, MObject::kNullObj, &returnStatus);
+
+	for (size_t objCount = 0; objCount < 10; objCount ++) {
 		returnStatus = addAttribute(inputObjects[objCount]);
 		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attribute\n");
 	}
 
-	for (size_t objCount = 0; objCount < 8; objCount++) {
-		returnStatus = attributeAffects(inputObjects[objCount], inputObjects[8]);
+	for (size_t objCount = 0; objCount < 9; objCount++) {
+		returnStatus = attributeAffects(inputObjects[objCount], inputObjects[9]);
 		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attributeAffects\n");
 	}
 	gridInitialized = false;
@@ -52,15 +54,15 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 {
 	MStatus returnStatus;
 
-	if (plug == inputObjects[8])
+	if (plug == inputObjects[9])
 	{
 		int width, height, time;
 		float density, dt, radius, viscosity;
 		long numParticles;
 
 		// Input handles
-		MDataHandle dataHandle[9];
-		for (size_t objCount = 0; objCount < 8; objCount++) {
+		MDataHandle dataHandle[10];
+		for (size_t objCount = 0; objCount < 9; objCount++) {
 			dataHandle[objCount] = data.inputValue(inputObjects[objCount], &returnStatus);
 			McheckErr(returnStatus, "Error getting " + objectNames[objCount] + " data handle\n");
 		}
@@ -74,9 +76,11 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		numParticles = (long) (dataHandle[5].asTime().value());
 		width = dataHandle[6].asTime().value();
 		height = dataHandle[7].asTime().value();
+		MObject containerObject = dataHandle[8].asMesh();
+		MFnMesh containerMesh(containerObject, &returnStatus);
 
 		// Output handle
-		dataHandle[8] = data.outputValue(inputObjects[8], &returnStatus);
+		dataHandle[9] = data.outputValue(inputObjects[9], &returnStatus);
 		McheckErr(returnStatus, "ERROR getting geometry data handle\n");
 
 		// Mesh manipulation
@@ -86,6 +90,11 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 
 		if (!gridInitialized || time == lastTime) {
 			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
+
+			// TODO: process container mesh
+			vector<vec3> containerTriangles;
+			this->grid.addContainer(containerTriangles);
+
 			gridInitialized = true;
 		}
 		if (lastTime < time) {
@@ -134,7 +143,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		}
 
 		// Sets output geometry data to newly processed data
-		dataHandle[8].set(newOutputData);
+		dataHandle[9].set(newOutputData);
 		data.setClean(plug);
 	}
 	else

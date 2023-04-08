@@ -25,7 +25,7 @@ using namespace std;
 		return MS::kFailure;		\
 	}
 
-const string objectNames[] = { "radius", "density", "viscosity", "dt", "time", "numParticles", "width", "height", "outputGeometry" };
+const string objectNames[] = { "radius", "density", "viscosity", "dt", "time", "numParticles", "width", "height", "container", "outputGeometry" };
 
 class MPBFluids :
 	public MPxNode
@@ -37,8 +37,8 @@ public:
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
-	// radius, density, viscosity, dt, time, numParticles, width, height, outputGeometry;
-	static MObject inputObjects[9];
+	// radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
+	static MObject inputObjects[10];
 	static MTypeId id;
 	Grid grid;
 	static bool gridInitialized;

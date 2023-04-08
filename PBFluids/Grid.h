@@ -4,6 +4,7 @@
 #include "kernel.h"
 #include <unordered_map>
 #include <string>
+#include "Scene.h"
 
 using namespace std;
 
@@ -71,12 +72,15 @@ public:
 	void updateParticleCell(Particle &p);
 	// go forward one time step for all particles and cells
 	void step();
+	// add container to grid
+	void addContainer(const vector<vec3> &triangles);
 
 private:
 	float density, dt, viscosity;
 	// map of cell coordinates to cell index
 	unordered_map<vec3, int, Hash> cellCoordMap;
 	const float tensileStabilityDenom = pow(kernel_poly6(0.2), nTensile);
+	Scene scene;
 
 	int computeCellIdx(int cellx, int celly, int cellz);
 };

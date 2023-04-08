@@ -4,13 +4,21 @@
 class Scene
 {
 public:
-	vector<Triangle> triangles;
+	vector<Triangle> sceneTriangles;
 	Scene() {};
+
+	void addTriangles(const vector<vec3> &triangles)
+	{
+		for (long numTriangles = 0; numTriangles < triangles.size() / 3; numTriangles++) {
+			Triangle triangle(triangles[numTriangles * 3], triangles[numTriangles * 3 + 1], triangles[numTriangles * 3 + 2]);
+			sceneTriangles.push_back(triangle);
+		}
+	}
 
 	void bounce(vec3 &center, float radius, vec3 &vel, float dt)
 	{
-		for (int i = 0; i < triangles.size(); i++) {
-			bool hit = triangles[i].bounce(center, radius, vel, dt);
+		for (Triangle triangle : sceneTriangles) {
+			bool hit = triangle.bounce(center, radius, vel, dt);
 			if (hit) {
 				return;
 			}

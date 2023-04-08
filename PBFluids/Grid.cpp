@@ -225,6 +225,11 @@ void Grid::step()
 	}
 }
 
+void Grid::addContainer(const vector<vec3> &triangles)
+{
+	this->scene.addTriangles(triangles);
+}
+
 int Grid::computeCellIdx(int cellx, int celly, int cellz)
 {
 	return cellx + celly * width + cellz * width * width;
