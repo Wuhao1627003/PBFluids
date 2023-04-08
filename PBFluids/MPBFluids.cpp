@@ -77,7 +77,6 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		width = dataHandle[6].asTime().value();
 		height = dataHandle[7].asTime().value();
 		MObject containerObject = dataHandle[8].asMesh();
-		MFnMesh containerMesh(containerObject, &returnStatus);
 
 		// Output handle
 		dataHandle[9] = data.outputValue(inputObjects[9], &returnStatus);
@@ -92,7 +91,22 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
 
 			// TODO: process container mesh
+			MFnMesh containerMesh(containerObject, &returnStatus);
+			MPointArray vertexPositions;
+			containerMesh.getPoints(vertexPositions);
+			MIntArray faceCounts, faceConnects;
+			containerMesh.getVertices(faceCounts, faceConnects);
 			vector<vec3> containerTriangles;
+
+			for (int i = 0; i < faceCounts.length(); i++) {
+				int faceCount = faceCounts[i];
+				for (int j = 0; j < faceCount; j++) {
+					int vertexIndex = faceConnects[i * faceCount + j];
+					MPoint vertexPos = vertexPositions[vertexIndex];
+					containerTriangles.push_back(vec3(vertexPos.x, vertexPos.y, vertexPos.z));
+				}
+			}
+			
 			this->grid.addContainer(containerTriangles);
 
 			gridInitialized = true;
