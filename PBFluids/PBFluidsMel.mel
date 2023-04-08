@@ -23,7 +23,7 @@ global proc makeWindow()
     	    frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
     			columnLayout;
     				$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 1.0 -field true`;
-    				$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.5 -field true`;
+    				$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.2 -field true`;
     				$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
     			setParent ..;
     		setParent ..;

@@ -22,9 +22,9 @@ void Grid::initParticles()
 	float x, y, z;
 	int cellIdx;
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		x = ((float)rand()) / RAND_MAX * width;
-		y = ((float) rand()) / RAND_MAX * width;
-		z = ((float) rand()) / RAND_MAX * height;
+		x = ((float)rand()) / RAND_MAX * width / 4;
+		y = ((float) rand()) / RAND_MAX * width / 4;
+		z = (1 + ((float) rand()) / RAND_MAX) * height / 4;
 		cellIdx = cellCoordMap.find(vec3((int) x == width ? width - 1: (int) x, (int) y == width ? width - 1 : (int) y, (int) z == height ? height - 1 : (int) z))->second;
 		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x, y, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
@@ -152,60 +152,68 @@ void Grid::step()
 		}
 
 		// collision with container
+		if (this->scene.sceneTriangles.size() > 0) {
 #pragma omp parallel for
-		for (int i = 0; i < particles.size(); i++) {
-			bool hit = false;
-			if (particles[i].posPredicted[0] < radius) {
-				particles[i].posPredicted[0] = radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
-				}
-				particles[i].vel[0] *= -2. / particles[i].numBounces;
+			for (int i = 0; i < particles.size(); i++) {
+				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter);
 			}
-			if (particles[i].posPredicted[0] > width - radius) {
-				particles[i].posPredicted[0] = width - radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
+		}
+		else {
+#pragma omp parallel for
+			for (int i = 0; i < particles.size(); i++) {
+				bool hit = false;
+				if (particles[i].posPredicted[0] < radius) {
+					particles[i].posPredicted[0] = radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[0] *= -2. / particles[i].numBounces;
 				}
-				particles[i].vel[0] *= -2. / particles[i].numBounces;
-			}
-			if (particles[i].posPredicted[1] < radius) {
-				particles[i].posPredicted[1] = radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
+				if (particles[i].posPredicted[0] > width - radius) {
+					particles[i].posPredicted[0] = width - radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[0] *= -2. / particles[i].numBounces;
 				}
-				particles[i].vel[1] *= -2. / particles[i].numBounces;
-			}
-			if (particles[i].posPredicted[1] > width - radius) {
-				particles[i].posPredicted[1] = width - radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
+				if (particles[i].posPredicted[1] < radius) {
+					particles[i].posPredicted[1] = radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[1] *= -2. / particles[i].numBounces;
 				}
-				particles[i].vel[1] *= -2. / particles[i].numBounces;
-			}
-			if (particles[i].posPredicted[2] < radius) {
-				particles[i].posPredicted[2] = radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
+				if (particles[i].posPredicted[1] > width - radius) {
+					particles[i].posPredicted[1] = width - radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[1] *= -2. / particles[i].numBounces;
 				}
-				particles[i].vel[2] *= -2. / particles[i].numBounces;
-			}
-			if (particles[i].posPredicted[2] > height - radius) {
-				particles[i].posPredicted[2] = height - radius;
-				if (!hit) {
-					particles[i].numBounces++;
-					hit = true;
+				if (particles[i].posPredicted[2] < radius) {
+					particles[i].posPredicted[2] = radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[2] *= -2. / particles[i].numBounces;
 				}
-				particles[i].vel[2] *= -2. / particles[i].numBounces;
-			}
-			
-			if (hit) {
-				particles[i].posPredicted += particles[i].vel * dt / numIter;
+				if (particles[i].posPredicted[2] > height - radius) {
+					particles[i].posPredicted[2] = height - radius;
+					if (!hit) {
+						particles[i].numBounces++;
+						hit = true;
+					}
+					particles[i].vel[2] *= -2. / particles[i].numBounces;
+				}
+
+				if (hit) {
+					particles[i].posPredicted += particles[i].vel * dt / numIter;
+				}
 			}
 		}
 	}
