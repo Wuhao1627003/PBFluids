@@ -71,7 +71,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		radius = (float) dataHandle[0].asDouble();
 		density = (float) dataHandle[1].asDouble();
 		viscosity = (float) dataHandle[2].asDouble();
-		dt = (float) dataHandle[3].asDouble();
+		dt = (float) dataHandle[3].asDouble() / 100.0;
 		time = dataHandle[4].asTime().value();
 		numParticles = (long) (dataHandle[5].asTime().value());
 		width = dataHandle[6].asTime().value();
