@@ -114,7 +114,7 @@ global proc setAsContainerMesh()
 
     if(`objExists $meshName`) 
     {
-        //polyTriangulate -ch 1 $meshName;
+        polyTriangulate -ch 1 $meshName;
         
         if (`objExists $currNode`)
         {
