@@ -17,16 +17,20 @@ void Grid::initCellCoordMap()
 
 void Grid::initParticles()
 {
+	numParticles = (width - 1) * (width - 1) * (height - 1);
 	this->particles.resize(numParticles);
 	this->allNeighborIDs.resize(numParticles);
-	float x, y, z;
+	int x, y, z;
 	int cellIdx;
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		x = ((float)rand()) / RAND_MAX * width / 4;
+		/*x = ((float)rand()) / RAND_MAX * width / 4;
 		y = ((float) rand()) / RAND_MAX * width / 4;
-		z = (1 + ((float) rand()) / RAND_MAX) * height / 4;
+		z = (1 + ((float) rand()) / RAND_MAX) * height / 4;*/
+		x = (particleID / (height - 1)) / (width - 1);
+		y = (particleID / (height - 1)) % (width - 1);
+		z = particleID % (height - 1);
 		cellIdx = cellCoordMap.find(vec3((int) x == width ? width - 1: (int) x, (int) y == width ? width - 1 : (int) y, (int) z == height ? height - 1 : (int) z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x, y, z));
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + 0.5, y + 0.5, z + 0.5));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -130,25 +134,7 @@ void Grid::step()
 				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
 			}
 			particles[p_i].deltaP /= this->density;
-			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP;
-		}
-
-		// collision with other particles
-		for (long p_i = 0; p_i < particles.size(); p_i++) {
-			vector<long> neighbours = allNeighborIDs[p_i];
-#pragma omp parallel for
-			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
-				long p_j = neighbours[p_jIdx];
-				if (p_i >= p_j) continue;
-				if (Distance(particles[p_i].posPredicted, particles[p_j].posPredicted) < 2 * radius) {
-					vec3 normal = particles[p_i].posPredicted - particles[p_j].posPredicted;
-					normal = normal.Normalize();
-					particles[p_i].vel = particles[p_i].vel.Length() * 0.8 * normal;
-					particles[p_j].vel = -particles[p_j].vel.Length() * 0.8 * normal;
-					particles[p_i].posPredicted += particles[p_i].vel * dt;
-					particles[p_j].posPredicted += particles[p_j].vel * dt;
-				}
-			}
+			particles[p_i].posPredicted += 0.05 * particles[p_i].deltaP;
 		}
 
 		// collision with container
@@ -213,6 +199,24 @@ void Grid::step()
 
 				if (hit) {
 					particles[i].posPredicted += particles[i].vel * dt / numIter;
+				}
+			}
+		}
+
+		// collision with other particles
+		for (long p_i = 0; p_i < particles.size(); p_i++) {
+			vector<long> neighbours = allNeighborIDs[p_i];
+#pragma omp parallel for
+			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
+				long p_j = neighbours[p_jIdx];
+				if (p_i >= p_j) continue;
+				if (Distance(particles[p_i].posPredicted, particles[p_j].posPredicted) < 2 * radius) {
+					vec3 normal = particles[p_i].posPredicted - particles[p_j].posPredicted;
+					normal = normal.Normalize();
+					particles[p_i].vel = particles[p_i].vel.Length() * normal;
+					particles[p_j].vel = -particles[p_j].vel.Length() * normal;
+					particles[p_i].posPredicted += particles[p_i].vel * dt;
+					particles[p_j].posPredicted += particles[p_j].vel * dt;
 				}
 			}
 		}

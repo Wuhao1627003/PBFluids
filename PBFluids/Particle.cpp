@@ -8,7 +8,13 @@ void Particle::preprocess(float dt)
 
 vector<long> Particle::findNeighborIDs(const Cell &c, const vector<Particle> &particles)
 {
-	return c.neighborParticleIDs;
+    vector<long> neighbors;
+    for (long p_j : c.neighborParticleIDs) {
+        if (p_j != this->ID && Distance(this->posPredicted, particles[p_j].posPredicted) < 2.) {
+            neighbors.push_back(p_j);
+		}
+	}
+	return neighbors;
 }
 
 void Particle::reset()
