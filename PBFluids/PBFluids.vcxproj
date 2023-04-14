@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(MAYA_LOCATION)\devkitBase\plugins\plugins\</OutDir>
     <TargetExt>.mll</TargetExt>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(ProjectName).mll</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName).mll</TargetName>
@@ -112,17 +112,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NT_PLUGIN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(MAYA_LOCATION)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\AutoDesk\Maya\Maya2022\Maya2022\include</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(ProjectName).mll</OutputFile>
-      <AdditionalLibraryDirectories>$(MAYA_LOCATION)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\AutoDesk\Maya\Maya2022\Maya2022\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;OpenMayaFx.lib;OpenMayaRender.lib;Image.lib;opengl32.lib</AdditionalDependencies>
     </Link>
     <ProjectReference>
