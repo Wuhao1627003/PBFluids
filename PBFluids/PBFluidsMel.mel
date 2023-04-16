@@ -220,7 +220,7 @@ global proc onDynamicCreate()
     
         // Adding the dynamic node
         $currNode = `createNode MPBFluids -n $nodeName`;
-        //setAttr ($currNode + ".mass") $mass;    // !!!!
+        setAttr ($currNode + ".mass") $mass;
         setAttr ($currNode + ".radius") $radius;
         setAttr ($currNode + ".density") $fluidDensity;
         setAttr ($currNode + ".viscosity") $viscosity;
@@ -234,7 +234,7 @@ global proc onDynamicCreate()
         
         if (`objExists $currContainerMesh`)
             {
-                connectAttr ($currContainerMesh + ".outMesh")($currNode + ".container");
+                connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
                 print($currContainerMesh + "complete");
             } 
     }

@@ -22,11 +22,11 @@ void Grid::initParticles()
 	float x, y, z;
 	int cellIdx;
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		x = (float)rand() / RAND_MAX * width / 4 - width / 2;
-		y = (float) rand() / RAND_MAX * width / 4 - width / 2;
+		x = (float)rand() / RAND_MAX * width / 2;
+		y = (float)rand() / RAND_MAX * width / 2;
 		z = (1. + (float) rand() / RAND_MAX) * height / 4;
 		cellIdx = cellCoordMap.find(vec3((int) x == width ? width - 1: (int) x, (int) y == width ? width - 1 : (int) y, (int) z == height ? height - 1 : (int) z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius, y + radius, z + radius));
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius - width / 2, y + radius - width / 2, z + radius));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -61,7 +61,7 @@ void Grid::initCells()
 
 void Grid::updateParticleCell(Particle &p)
 {
-	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0], (int) p.pos[1], (int) p.pos[2]));
+	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0] + width / 2, (int) p.pos[1] + width / 2, (int) p.pos[2]));
 	if (it == cellCoordMap.end()) {
 		// Out of boundary
 		return;
