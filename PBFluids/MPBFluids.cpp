@@ -89,7 +89,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
 
-		if (!gridInitialized || lastTime >= time) {
+		if (!gridInitialized || lastTime > time) {
 			this->grid = Grid(width, height, mass, density, viscosity, numParticles, dt, radius);
 
 			if (containerObject != MObject::kNullObj) {
