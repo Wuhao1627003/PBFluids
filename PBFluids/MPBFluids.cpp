@@ -76,7 +76,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		numParticles = (long) (dataHandle[5].asTime().value());
 		width = dataHandle[6].asTime().value();
 		height = dataHandle[7].asTime().value();
-		MObject containerObject = dataHandle[8].asMesh();
+		MObject containerObject = dataHandle[8].asMeshTransformed();
 
 		// Output handle
 		dataHandle[9] = data.outputValue(inputObjects[9], &returnStatus);
@@ -87,38 +87,35 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
 
-		if (!gridInitialized || time == lastTime) {
+		if (!gridInitialized || time == 1) {
 			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
 
-			// TODO: process container mesh
-			MFnMesh containerMesh(containerObject, &returnStatus);
-			MPointArray vertexPositions;
-			containerMesh.getPoints(vertexPositions);
-			MIntArray faceCounts, faceConnects;
-			containerMesh.getVertices(faceCounts, faceConnects);
-			vector<vec3> containerTriangles;
+			if (containerObject != MObject::kNullObj) {
+				MFnMesh containerMesh(containerObject, &returnStatus);
+				MPointArray vertexPositions;
+				containerMesh.getPoints(vertexPositions, MSpace::kWorld);
+				MIntArray faceCounts, faceConnects;
+				containerMesh.getVertices(faceCounts, faceConnects);
+				vector<vec3> containerTriangles;
 
-			for (int i = 0; i < faceCounts.length(); i++) {
-				int faceCount = faceCounts[i];
-				for (int j = 0; j < faceCount; j++) {
-					int vertexIndex = faceConnects[i * faceCount + j];
-					MPoint vertexPos = vertexPositions[vertexIndex];
-					containerTriangles.push_back(vec3(vertexPos.x, vertexPos.y, vertexPos.z));
+				for (int i = 0; i < faceCounts.length(); i++) {
+					int faceCount = faceCounts[i];
+					for (int j = 0; j < faceCount; j++) {
+						int vertexIndex = faceConnects[i * faceCount + j];
+						MPoint vertexPos = vertexPositions[vertexIndex];
+						containerTriangles.push_back(vec3(vertexPos.x, vertexPos.z, vertexPos.y));
+					}
 				}
+
+				this->grid.addContainer(containerTriangles);
 			}
-			
-			this->grid.addContainer(containerTriangles);
 
 			gridInitialized = true;
-		}
-		if (lastTime < time) {
-			for (int t = lastTime; t < time; t++) {
-				grid.step();
-			}
+			time = 1;
+			lastTime = 1;
 		}
 		else {
-			this->grid = Grid(width, height, density, viscosity, numParticles, dt, radius);
-			for (int t = 0; t < time; t++) {
+			for (int t = lastTime; t < time; t++) {
 				grid.step();
 			}
 		}

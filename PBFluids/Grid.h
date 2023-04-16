@@ -39,6 +39,7 @@ public:
 	int width, height;
 	long numParticles;
 	float radius;
+	bool firstStep = true;
 		
 	Grid() {};
 	Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius):

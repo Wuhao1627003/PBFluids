@@ -2,7 +2,7 @@
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., 0., -9.8) * dt;
+	this->vel += vec3(0., 0., -10) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 
@@ -54,14 +54,14 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
     vorticity_f = 0.0001 * (this->N).Cross(this->omega);
 
     // Update with force due to vorticity
-    this->vel += dt * vorticity_f;
+    //this->vel += dt * vorticity_f;
 
 	// ----------- Computed Viscosity ---------
     vec3 v_new = this->vel;
     for (long p_j : neighborIDs) {
         v_new += 0.0001 * kernel_poly6(this->posPredicted, particles[p_j].posPredicted) * (particles[p_j].vel - this->vel);
     }
-    this->vel = v_new;
+    //this->vel = v_new;
 
 	this->pos = this->posPredicted;
 }

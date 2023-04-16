@@ -9,20 +9,22 @@ public:
 
 	void addTriangles(const vector<vec3> &triangles)
 	{
+		sceneTriangles.clear();
 		for (long numTriangles = 0; numTriangles < triangles.size() / 3; numTriangles++) {
 			Triangle triangle(triangles[numTriangles * 3], triangles[numTriangles * 3 + 1], triangles[numTriangles * 3 + 2]);
 			sceneTriangles.push_back(triangle);
 		}
 	}
 
-	void bounce(vec3 &center, float radius, vec3 &vel, float dt)
+	bool bounce(vec3 &center, float radius, vec3 &vel, float dt)
 	{
 		for (Triangle triangle : sceneTriangles) {
 			bool hit = triangle.bounce(center, radius, vel, dt);
 			if (hit) {
-				return;
+				return true;
 			}
 		}
+		return false;
 	}
 };
 
