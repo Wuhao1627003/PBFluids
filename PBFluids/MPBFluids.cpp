@@ -122,9 +122,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 			lastTime = 1;
 		}
 		else {
-			for (int t = lastTime; t < time; t++) {
-				grid.step();
-			}
+			grid.step();
 		}
 		lastTime = time;
 
