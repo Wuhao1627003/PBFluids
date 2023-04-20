@@ -130,7 +130,7 @@ void Grid::step()
 				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
 			}
 			particles[p_i].deltaP /= this->density;
-			particles[p_i].posPredicted += 0.0005 * particles[p_i].deltaP * dt / numIter;
+			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt / numIter;
 		}
 
 		// collision with container
@@ -141,56 +141,39 @@ void Grid::step()
 			}
 		}
 		else {
+			int velMultiplier = -1.5;
 #pragma omp parallel for
 			for (int i = 0; i < particles.size(); i++) {
 				bool hit = false;
-				if (particles[i].posPredicted[0] < radius) {
-					particles[i].posPredicted[0] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[0] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[0] < -width / 2 + radius) {
+					particles[i].posPredicted[0] = -width / 2 + radius;
+					hit = true;
+					particles[i].vel[0] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[0] > width - radius) {
-					particles[i].posPredicted[0] = width - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[0] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[0] > width / 2 - radius) {
+					particles[i].posPredicted[0] = width / 2 - radius;
+					hit = true;
+					particles[i].vel[0] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[1] < radius) {
-					particles[i].posPredicted[1] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[1] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[1] < -width / 2 + radius) {
+					particles[i].posPredicted[1] = -width / 2 + radius;
+					hit = true;
+					particles[i].vel[1] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[1] > width - radius) {
-					particles[i].posPredicted[1] = width - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[1] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[1] > width / 2 - radius) {
+					particles[i].posPredicted[1] = width / 2 - radius;
+					hit = true;
+					particles[i].vel[1] *= velMultiplier;
 				}
 				if (particles[i].posPredicted[2] < radius) {
 					particles[i].posPredicted[2] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[2] *= -2. / particles[i].numBounces;
+					hit = true;
+					particles[i].vel[2] *= velMultiplier;
 				}
 				if (particles[i].posPredicted[2] > height - radius) {
 					particles[i].posPredicted[2] = height - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[2] *= -2. / particles[i].numBounces;
+					hit = true;
+					particles[i].vel[2] *= velMultiplier;
 				}
 
 				if (hit) {
@@ -202,25 +185,24 @@ void Grid::step()
 		if (firstStep) {
 			continue;
 		}
+
 		// collision with other particles
-		for (long p_i = 0; p_i < particles.size(); p_i++) {
+		/*for (long p_i = 0; p_i < particles.size(); p_i++) {
 			vector<long> neighbours = allNeighborIDs[p_i];
 #pragma omp parallel for
 			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
 				long p_j = neighbours[p_jIdx];
 				if (p_i >= p_j) continue;
 				if (Distance(particles[p_i].posPredicted, particles[p_j].posPredicted) < 2 * radius) {
-					particles[p_i].numBounces++;
-					particles[p_j].numBounces++;
 					vec3 normal = particles[p_i].posPredicted - particles[p_j].posPredicted;
 					normal = normal.Normalize();
-					particles[p_i].vel = particles[p_i].vel.Length() / particles[p_i].numBounces * normal;
-					particles[p_j].vel = -particles[p_j].vel.Length() / particles[p_j].numBounces * normal;
+					particles[p_i].vel = particles[p_i].vel.Length() * normal;
+					particles[p_j].vel = -particles[p_j].vel.Length() * normal;
 					particles[p_i].posPredicted += particles[p_i].vel * dt;
 					particles[p_j].posPredicted += particles[p_j].vel * dt;
 				}
 			}
-		}
+		}*/
 	}
 
 #pragma omp parallel for

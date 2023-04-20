@@ -9,7 +9,7 @@ class Particle
 {
 public:
 	long ID;
-	int cellIdx, numBounces = 0;
+	int cellIdx;
 	vec3 pos, posPredicted, deltaP;
 	vec3 vel = vec3(0., 0., 0.);
 	float density, gradNorm, lambda, constraint;

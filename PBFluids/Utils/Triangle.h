@@ -1,8 +1,6 @@
 #pragma once
 #include "vec.h"
 
-#define EPSILON 0.0000001
-
 class Triangle
 {
 public:
