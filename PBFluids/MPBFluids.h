@@ -37,8 +37,8 @@ public:
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
-	// radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
-	static MObject inputObjects[10];
+	// mass, radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
+	static MObject inputObjects[11];
 	static MTypeId id;
 	Grid grid;
 	static bool gridInitialized;

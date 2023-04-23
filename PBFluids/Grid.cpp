@@ -17,20 +17,16 @@ void Grid::initCellCoordMap()
 
 void Grid::initParticles()
 {
-	numParticles = (width - 1) * (width - 1) * (height - 1);
 	this->particles.resize(numParticles);
 	this->allNeighborIDs.resize(numParticles);
-	int x, y, z;
+	float x, y, z;
 	int cellIdx;
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		/*x = ((float)rand()) / RAND_MAX * width / 4;
-		y = ((float) rand()) / RAND_MAX * width / 4;
-		z = (1 + ((float) rand()) / RAND_MAX) * height / 4;*/
-		x = (particleID / (height - 1)) / (width - 1);
-		y = (particleID / (height - 1)) % (width - 1);
-		z = particleID % (height - 1);
+		x = (float)rand() / RAND_MAX * width / 4;
+		y = (float)rand() / RAND_MAX * width / 4;
+		z = (1. + (float) rand() / RAND_MAX) * height / 4;
 		cellIdx = cellCoordMap.find(vec3((int) x == width ? width - 1: (int) x, (int) y == width ? width - 1 : (int) y, (int) z == height ? height - 1 : (int) z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + 0.5, y + 0.5, z + 0.5));
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius - width / 2, y + radius - width / 2, z + radius));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -65,7 +61,7 @@ void Grid::initCells()
 
 void Grid::updateParticleCell(Particle &p)
 {
-	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0], (int) p.pos[1], (int) p.pos[2]));
+	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0] + width / 2, (int) p.pos[1] + width / 2, (int) p.pos[2]));
 	if (it == cellCoordMap.end()) {
 		// Out of boundary
 		return;
@@ -91,7 +87,7 @@ void Grid::step()
 		allNeighborIDs[i] = particles[i].findNeighborIDs(this->gridCells[particles[i].cellIdx], particles);
 	}
 
-	// TODO: main solver loop
+	// main solver loop
 	for (size_t iter = 0; iter < numIter; iter++) {
 		// calculate lambdas
 #pragma omp parallel for
@@ -134,7 +130,7 @@ void Grid::step()
 				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
 			}
 			particles[p_i].deltaP /= this->density;
-			particles[p_i].posPredicted += 0.05 * particles[p_i].deltaP;
+			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt / numIter;
 		}
 
 		// collision with container
@@ -145,66 +141,53 @@ void Grid::step()
 			}
 		}
 		else {
+			int velMultiplier = -1.5;
 #pragma omp parallel for
 			for (int i = 0; i < particles.size(); i++) {
 				bool hit = false;
-				if (particles[i].posPredicted[0] < radius) {
-					particles[i].posPredicted[0] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[0] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[0] < -width / 2 + radius) {
+					particles[i].posPredicted[0] = -width / 2 + radius;
+					hit = true;
+					particles[i].vel[0] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[0] > width - radius) {
-					particles[i].posPredicted[0] = width - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[0] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[0] > width / 2 - radius) {
+					particles[i].posPredicted[0] = width / 2 - radius;
+					hit = true;
+					particles[i].vel[0] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[1] < radius) {
-					particles[i].posPredicted[1] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[1] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[1] < -width / 2 + radius) {
+					particles[i].posPredicted[1] = -width / 2 + radius;
+					hit = true;
+					particles[i].vel[1] *= velMultiplier;
 				}
-				if (particles[i].posPredicted[1] > width - radius) {
-					particles[i].posPredicted[1] = width - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[1] *= -2. / particles[i].numBounces;
+				if (particles[i].posPredicted[1] > width / 2 - radius) {
+					particles[i].posPredicted[1] = width / 2 - radius;
+					hit = true;
+					particles[i].vel[1] *= velMultiplier;
 				}
 				if (particles[i].posPredicted[2] < radius) {
 					particles[i].posPredicted[2] = radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[2] *= -2. / particles[i].numBounces;
+					hit = true;
+					particles[i].vel[2] *= velMultiplier;
 				}
 				if (particles[i].posPredicted[2] > height - radius) {
 					particles[i].posPredicted[2] = height - radius;
-					if (!hit) {
-						particles[i].numBounces++;
-						hit = true;
-					}
-					particles[i].vel[2] *= -2. / particles[i].numBounces;
+					hit = true;
+					particles[i].vel[2] *= velMultiplier;
 				}
 
 				if (hit) {
-					particles[i].posPredicted += particles[i].vel * dt / numIter;
+					particles[i].posPredicted += particles[i].vel * dt;
 				}
 			}
 		}
 
+		if (firstStep) {
+			continue;
+		}
+
 		// collision with other particles
-		for (long p_i = 0; p_i < particles.size(); p_i++) {
+		/*for (long p_i = 0; p_i < particles.size(); p_i++) {
 			vector<long> neighbours = allNeighborIDs[p_i];
 #pragma omp parallel for
 			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
@@ -219,7 +202,7 @@ void Grid::step()
 					particles[p_j].posPredicted += particles[p_j].vel * dt;
 				}
 			}
-		}
+		}*/
 	}
 
 #pragma omp parallel for
@@ -235,6 +218,8 @@ void Grid::step()
 	for (int i = 0; i < gridCells.size(); i++) {
 		gridCells[i].updateNeighbors(gridCells);
 	}
+
+	firstStep = false;
 }
 
 void Grid::addContainer(const vector<vec3> &triangles)

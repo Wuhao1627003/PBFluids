@@ -9,7 +9,6 @@
 using namespace std;
 
 #define numIter 10
-#define particleMass 1.0
 #define cfmEpsilon 60.0    // Constraint Force Mixing Relaxation
 #define kTensile 0.1
 #define nTensile 4
@@ -38,12 +37,18 @@ public:
 	vector<vector<long>> allNeighborIDs;
 	int width, height;
 	long numParticles;
-	float radius;
+	float radius, particleMass;
+	bool firstStep = true;
 		
 	Grid() {};
-	Grid(int width, int height, float density, float viscosity, long numParticles, float dt, float radius):
-		width(width), height(height), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
+	Grid(int width, int height, float mass, float density, float viscosity, long numParticles, float dt, float radius):
+		width(width), height(height), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
 	{
+		gridCells.clear();
+		particles.clear();
+		allNeighborIDs.clear();
+		cellCoordMap.clear();
+
 		initCellCoordMap();
 		initParticles();
 		initCells();
@@ -52,6 +57,7 @@ public:
 	{
 		this->width = g.width;
 		this->height = g.height;
+		this->particleMass = g.particleMass;
 		this->density = g.density;
 		this->viscosity = g.viscosity;
 		this->dt = g.dt;
