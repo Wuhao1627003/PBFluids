@@ -55,10 +55,12 @@ global proc makeWindow()
     			    text -label "Or, You Can Make Selected 3D Mesh As:" -align "left";
     			setParent ..;
     			
-    			rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
+    			rowLayout -numberOfColumns 5 -adjustableColumn 4 -columnAlign3 "left" "center" "right";
         			button -label "Fluid Containers" - command "setAsContainerMesh" -align "left";
-        			text -label "" -align "center";
-    			    button -label "Collision Objects" -command "setAsCollisionMesh" -align "right";
+        			text -label "" ;
+    			    button -label "Collision Objects" -command "setAsCollisionMesh" -align "center";
+    			    text -label "";
+    			    button -label "Decompose the Selected Mesh" -command "decomposeSelectedMesh" -align "right";
     		    setParent ..;
     			
     		setParent ..;
@@ -141,6 +143,57 @@ global proc setAsCollisionMesh()
        //polyTriangulate -ch 1 $meshName;
        
        setMeshConfirmation($meshName, "Collision Object");
+    }
+}
+
+global proc decomposeSelectedMesh()
+{
+    global string $nameObj_RN;
+    
+    string $meshName = `textField -q -tx $nameObj_RN`;
+    
+    if(`objExists $meshName`) 
+    {
+        polyTriangulate -ch 1 $meshName;
+        
+        float $vtxPos[]; 
+        int $count;
+        int $nVerts[] = `polyEvaluate -vertex $meshName`;
+        string $fileName = "vertexPositions.xyz";
+        string $filePath = "C:/Users/83995/Desktop/" + $fileName;
+        //string $fileId;
+        
+        // Open the output file for writing
+        $fileId = `fopen $filePath  "w"`;
+    
+        for ($count = 0; $count < $nVerts[0]; $count++)
+        {
+            $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
+            fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2] + "\n");
+        }
+    
+        // Close the output file
+        fclose $fileId;
+        
+        /*
+        float $vtxPos[]; 
+        int $count;
+        int $nVerts[] = `polyEvaluate -vertex $meshName`;
+        
+        for ($count = 0; $count < $nVerts[0]; $count++)
+        {
+            $vtxPos[$count] = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
+        }
+        
+        print $vtxPos;
+        */
+    }
+    else
+    {
+        confirmDialog -title "No Mesh Selected Yet" 
+            -message "You have not selected any mesh yet. Please select mesh first!!!"
+            -button "Ok" 
+            -cancelButton "Ok" -defaultButton "Ok";
     }
 }
 
@@ -234,7 +287,7 @@ global proc onDynamicCreate()
         
         if (`objExists $currContainerMesh`)
             {
-                connectAttr ($currContainerMesh + ".outMesh")($currNode + ".container");
+                connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
                 print($currContainerMesh + "complete");
             } 
     }
