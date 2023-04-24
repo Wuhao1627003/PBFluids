@@ -1,6 +1,7 @@
 global string $nameObj_RN;
 global string $currContainerMesh;
 global string $currNode;
+global string $currPath;
 
 global proc makeWindow() 
 {    
@@ -32,16 +33,16 @@ global proc makeWindow()
     		
     		frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
     			columnLayout;
-    				$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1 -max 10.0 -value 2 -field true`;
+    				$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 0.1 -max 10.0 -value 0.2 -field true`;
     				$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
-    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 1 -max 10000 -value 500 -field true`;
+    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
     			setParent ..;
     		setParent ..;
     		
     		frameLayout -label "Boundary Settings (Simulation Box)" -collapsable true -backgroundShade true -borderVisible false;
     			columnLayout;
-    				$widthSlider = `intSliderGrp -label "Width" -min 1 -max 100 -value 10 -field true`;
-    				$heightSlider = `intSliderGrp -label "Height" -min 1 -max 100 -value 5 -field true`;
+    				$widthSlider = `intSliderGrp -label "Width" -min 5 -max 100 -value 10 -field true`;
+    				$heightSlider = `intSliderGrp -label "Height" -min 5 -max 100 -value 10 -field true`;
     			setParent ..;
     			
     			rowLayout -numberOfColumns 4 -adjustableColumn 1;
@@ -149,6 +150,7 @@ global proc setAsCollisionMesh()
 global proc decomposeSelectedMesh()
 {
     global string $nameObj_RN;
+    global string $currPath;
     
     string $meshName = `textField -q -tx $nameObj_RN`;
     
@@ -160,7 +162,7 @@ global proc decomposeSelectedMesh()
         int $count;
         int $nVerts[] = `polyEvaluate -vertex $meshName`;
         string $fileName = "vertexPositions.xyz";
-        string $filePath = "C:/Users/83995/Desktop/" + $fileName;
+        string $filePath = $currPath + $fileName;
         //string $fileId;
         
         // Open the output file for writing
@@ -174,19 +176,6 @@ global proc decomposeSelectedMesh()
     
         // Close the output file
         fclose $fileId;
-        
-        /*
-        float $vtxPos[]; 
-        int $count;
-        int $nVerts[] = `polyEvaluate -vertex $meshName`;
-        
-        for ($count = 0; $count < $nVerts[0]; $count++)
-        {
-            $vtxPos[$count] = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
-        }
-        
-        print $vtxPos;
-        */
     }
     else
     {
@@ -273,7 +262,7 @@ global proc onDynamicCreate()
     
         // Adding the dynamic node
         $currNode = `createNode MPBFluids -n $nodeName`;
-        setAttr ($currNode + ".mass") $mass;
+        //setAttr ($currNode + ".mass") $mass;    // !!!!
         setAttr ($currNode + ".radius") $radius;
         setAttr ($currNode + ".density") $fluidDensity;
         setAttr ($currNode + ".viscosity") $viscosity;
@@ -318,6 +307,16 @@ global proc onClear() {
         }
     } else warning "Reset cancelled: scene preserved\n";
 }
+
+global proc setCurrPath(string $s)
+{
+    global string $currPath;
+    
+    $currPath = $s;
+    
+    print("Current Path: " + $currPath);
+}
+
 
 global string $gMainWindow;
 setParent $gMainWindow;

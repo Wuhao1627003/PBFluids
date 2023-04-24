@@ -22,6 +22,9 @@ MStatus initializePlugin(MObject obj)
 	sprintf_s(buffer, 2048, menuPath.asChar());
 	MGlobal::executeCommand(buffer, true);
 
+	MString melCommand = menuPath + MString("; setCurrPath(") + pluginPath + MString(")");
+	MGlobal::executeCommand(melCommand, true);
+
 	return status;
 }
 
