@@ -167,3 +167,12 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 
 	return returnStatus;
 }
+
+MStatus MPBFluids::meshDecompose()
+{
+	MStatus returnStatus;
+
+
+
+	return returnStatus;
+}

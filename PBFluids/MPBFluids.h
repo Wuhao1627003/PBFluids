@@ -37,6 +37,8 @@ public:
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
+	static MStatus meshDecompose();
+
 	// mass, radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
 	static MObject inputObjects[11];
 	static MTypeId id;

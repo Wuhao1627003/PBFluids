@@ -162,11 +162,12 @@ global proc decomposeSelectedMesh()
         int $count;
         int $nVerts[] = `polyEvaluate -vertex $meshName`;
         string $fileName = "vertexPositions.xyz";
+        print $currPath;
         string $filePath = $currPath + $fileName;
         //string $fileId;
         
         // Open the output file for writing
-        $fileId = `fopen $filePath  "w"`;
+        int $fileId = `fopen $filePath  "w"`;
     
         for ($count = 0; $count < $nVerts[0]; $count++)
         {
