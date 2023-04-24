@@ -168,11 +168,13 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 	return returnStatus;
 }
 
-MStatus MPBFluids::meshDecompose()
+/*
+MStatus MPBFluids::meshDecompose(std::string filePath)
 {
 	MStatus returnStatus;
 
-
+	//std::vector<GEOM_WOF::Point3> vPoints;
+	//GEOM_WOF::readPoints_auto(filePath, vPoints);
 
 	return returnStatus;
-}
+}*/

@@ -2,6 +2,7 @@
 
 #include "Grid.h"
 #include "Utils/sphere.h"
+#include "wof_api.h"
 
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnTypedAttribute.h>
@@ -37,7 +38,7 @@ public:
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
 
-	static MStatus meshDecompose();
+	//static MStatus meshDecompose(std::string filePath);
 
 	// mass, radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
 	static MObject inputObjects[11];
