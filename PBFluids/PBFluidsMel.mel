@@ -179,8 +179,8 @@ global proc decomposeSelectedMesh()
         fclose $fileId;
         
         // Call the function in the PlugIn
-        //string $plugInCommand = "meshDecompose(\"" + $filePath + "\")";
-        //MEL.eval($plugInCommand);
+        string $plugInCommand = "meshDecompose(\"" + $filePath + "\")";
+        MEL.eval($plugInCommand);
     }
     else
     {
