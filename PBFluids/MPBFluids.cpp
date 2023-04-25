@@ -175,5 +175,5 @@ MStatus MPBFluids::meshDecompose(std::string filePath)
 	std::vector<GEOM_WOF::Point3> vPoints;
 	GEOM_WOF::readPoints_auto(filePath, vPoints);
 
-	return returnStatus;
+	return MStatus::kSuccess;
 }

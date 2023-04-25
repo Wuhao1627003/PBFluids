@@ -150,6 +150,7 @@ global proc setAsCollisionMesh()
 global proc decomposeSelectedMesh()
 {
     global string $nameObj_RN;
+    global string $currNode;
     global string $currPath;
     
     string $meshName = `textField -q -tx $nameObj_RN`;
@@ -178,9 +179,18 @@ global proc decomposeSelectedMesh()
         // Close the output file
         fclose $fileId;
         
-        // Call the function in the PlugIn
-        string $plugInCommand = "meshDecompose(\"" + $filePath + "\")";
-        MEL.eval($plugInCommand);
+        if(`objExists $currNode`) 
+        {
+            // Call the function in the PlugIn
+            string $myResult = $currNode.meshDecompose($filePath);
+        }
+        else
+        {
+            confirmDialog -title "No Node Created Yet" 
+                -message "Sorry you have to create a PBFluids Node first, please click generate button first!!!"
+                -button "Ok" 
+                -cancelButton "Ok" -defaultButton "Ok";
+        }
     }
     else
     {
