@@ -16,11 +16,8 @@ MStatus initializePlugin(MObject obj)
 	}
 
 	// Auto-register Mel menu script
-	char buffer[2048];
 	MString pluginPath = plugin.loadPath() + MString("/") + MString("PBFluidsMel.mel\"");
 	MString menuPath = MString("source \"") + pluginPath;
-	sprintf_s(buffer, 2048, menuPath.asChar());
-	MGlobal::executeCommand(buffer, true);
 
 	MString melCommand = menuPath + MString("; setCurrPath(\"") + pluginPath + MString(")");
 	MGlobal::executeCommand(melCommand);
@@ -39,6 +36,8 @@ MStatus uninitializePlugin(MObject obj)
 		status.perror("deregisterNode");
 		return status;
 	}
+	
+	// TODO: remove xyz file
 
 	return status;
 }

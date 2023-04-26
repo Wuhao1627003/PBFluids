@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include "Scene.h"
+#include <wof_api_functions.h>
 
 using namespace std;
 
@@ -38,7 +39,7 @@ public:
 	int width, height;
 	long numParticles;
 	float radius, particleMass;
-	bool firstStep = true;
+	std::vector<GEOM_WOF::Point3> particleCenters;
 		
 	Grid() {};
 	Grid(int width, int height, float mass, float density, float viscosity, long numParticles, float dt, float radius):
@@ -48,9 +49,16 @@ public:
 		particles.clear();
 		allNeighborIDs.clear();
 		cellCoordMap.clear();
+		particleCenters.clear();
 
 		initCellCoordMap();
-		initParticles();
+		if (particleCenters.size() > 0) {
+			numParticles = particleCenters.size();
+			initParticlesFromMesh();
+		}
+		else {
+			initParticles();
+		}
 		initCells();
 	};
 	void operator=(const Grid &g)
@@ -72,6 +80,7 @@ public:
 	void initCellCoordMap();
 	// initialize all properties of particles
 	void initParticles();
+	void initParticlesFromMesh();
 	// initialize all properties of cells, and populate with particles
 	void initCells();
 	// update the cell that the particle is in

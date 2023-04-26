@@ -26,7 +26,7 @@ using namespace std;
 		return MS::kFailure;		\
 	}
 
-const string objectNames[] = { "radius", "density", "viscosity", "dt", "time", "numParticles", "width", "height", "container", "outputGeometry" };
+const string objectNames[] = { "mass", "radius", "density", "viscosity", "dt", "time", "numParticles", "width", "height", "container", "outputGeometry" };
 
 class MPBFluids :
 	public MPxNode
@@ -37,9 +37,7 @@ public:
 	MStatus compute(const MPlug &plug, MDataBlock &data) override;
 	static void *creator() { return new MPBFluids; }
 	static MStatus initialize();
-
-	static MStatus meshDecompose(std::string filePath);
-
+	
 	// mass, radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
 	static MObject inputObjects[11];
 	static MTypeId id;

@@ -31,6 +31,20 @@ void Grid::initParticles()
 	}
 }
 
+void Grid::initParticlesFromMesh()
+{
+	this->particles.resize(numParticles);
+	this->allNeighborIDs.resize(numParticles);
+	double x, y, z;
+	int cellIdx;
+	for (long particleID = 0; particleID < numParticles; particleID++) {
+		particleCenters[particleID].xyz(x, y, z);
+		cellIdx = cellCoordMap.find(vec3((int)x == width ? width - 1 : (int)x, (int)y == width ? width - 1 : (int)y, (int)z == height ? height - 1 : (int)z))->second;
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius - width / 2, y + radius - width / 2, z + radius));
+		this->gridCells[cellIdx].particleIDs.push_back(particleID);
+	}
+}
+
 void Grid::initCells()
 {
 	int cellx, celly, cellz, cellIdx;
@@ -133,13 +147,15 @@ void Grid::step()
 			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt / numIter;
 		}
 
-		// collision with container
+		// --------- Collision with Container
+		// collision with custom container
 		if (this->scene.sceneTriangles.size() > 0) {
 #pragma omp parallel for
 			for (int i = 0; i < particles.size(); i++) {
 				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter);
 			}
 		}
+		// collision with default box
 		else {
 			int velMultiplier = -1.5;
 #pragma omp parallel for
@@ -181,28 +197,6 @@ void Grid::step()
 				}
 			}
 		}
-
-		if (firstStep) {
-			continue;
-		}
-
-		// collision with other particles
-		/*for (long p_i = 0; p_i < particles.size(); p_i++) {
-			vector<long> neighbours = allNeighborIDs[p_i];
-#pragma omp parallel for
-			for (long p_jIdx = 0; p_jIdx < neighbours.size(); p_jIdx++) {
-				long p_j = neighbours[p_jIdx];
-				if (p_i >= p_j) continue;
-				if (Distance(particles[p_i].posPredicted, particles[p_j].posPredicted) < 2 * radius) {
-					vec3 normal = particles[p_i].posPredicted - particles[p_j].posPredicted;
-					normal = normal.Normalize();
-					particles[p_i].vel = particles[p_i].vel.Length() * normal;
-					particles[p_j].vel = -particles[p_j].vel.Length() * normal;
-					particles[p_i].posPredicted += particles[p_i].vel * dt;
-					particles[p_j].posPredicted += particles[p_j].vel * dt;
-				}
-			}
-		}*/
 	}
 
 #pragma omp parallel for
@@ -218,8 +212,6 @@ void Grid::step()
 	for (int i = 0; i < gridCells.size(); i++) {
 		gridCells[i].updateNeighbors(gridCells);
 	}
-
-	firstStep = false;
 }
 
 void Grid::addContainer(const vector<vec3> &triangles)

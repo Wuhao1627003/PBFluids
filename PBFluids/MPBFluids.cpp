@@ -90,7 +90,15 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		McheckErr(returnStatus, "ERROR creating outputData");
 
 		if (!gridInitialized || lastTime > time) {
-			this->grid = Grid(width, height, mass, density, viscosity, numParticles, dt, radius);
+			grid = Grid(width, height, mass, density, viscosity, numParticles, dt, radius);
+
+			vector<GEOM_WOF::Point3> vPoints;
+
+			// TODO: read in file path from parameter
+			string filePath = "";
+
+			GEOM_WOF::readPoints_auto(filePath, vPoints);
+			GEOM_WOF::toCloud(vPoints, 0.2, 200, grid.particleCenters);
 
 			if (containerObject != MObject::kNullObj) {
 				MFnMesh containerMesh(containerObject, &returnStatus);
@@ -114,7 +122,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 					}
 				}
 
-				this->grid.addContainer(containerTriangles);
+				grid.addContainer(containerTriangles);
 			}
 
 			gridInitialized = true;
@@ -166,14 +174,4 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		returnStatus = MS::kUnknownParameter;
 
 	return returnStatus;
-}
-
-MStatus MPBFluids::meshDecompose(std::string filePath)
-{
-	MStatus returnStatus;
-
-	std::vector<GEOM_WOF::Point3> vPoints;
-	GEOM_WOF::readPoints_auto(filePath, vPoints);
-
-	return MStatus::kSuccess;
 }
