@@ -7,6 +7,8 @@ MTypeId MPBFluids::id(0x80080);
 bool MPBFluids::gridInitialized(false);
 int MPBFluids::lastTime(0);
 
+//extern string filePathExport;
+
 MString MPointToMString(MPoint p)
 {
 	return MString((std::to_string(p.x) + "," + std::to_string(p.y) + "," + std::to_string(p.z) + "\n").c_str());

@@ -2,6 +2,8 @@
 #include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 
+static string filePathExport = "";
+
 MStatus initializePlugin(MObject obj)
 {
 	MStatus   status = MStatus::kSuccess;
@@ -16,16 +18,17 @@ MStatus initializePlugin(MObject obj)
 	}
 
 	// Auto-register Mel menu script
+	filePathExport = (plugin.loadPath() + MString("/") + MString("vertexPositions.xyz")).asChar();
 	MString pluginPath = plugin.loadPath() + MString("/") + MString("PBFluidsMel.mel\"");
 	MString menuPath = MString("source \"") + pluginPath;
 
-	MString melCommand = menuPath + MString("; setCurrPath(\"") + pluginPath + MString(")");
+	MString melCommand = menuPath + MString("; setCurrPath(\"") + plugin.loadPath() + MString("/)");
 	MGlobal::executeCommand(melCommand);
 
 	return status;
 }
 
-MStatus uninitializePlugin(MObject obj)
+MStatus uninitializePlugin(MObject obj) 
 {
 	MStatus   status = MStatus::kSuccess;
 	MFnPlugin plugin(obj);
