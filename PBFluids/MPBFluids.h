@@ -17,6 +17,7 @@
 #include <maya/MFnMeshData.h>
 #include <maya/MGlobal.h>
 #include <maya/MIOStream.h>
+#include <experimental/filesystem>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ public:
 	// mass, radius, density, viscosity, dt, time, numParticles, width, height, container, outputGeometry;
 	static MObject inputObjects[11];
 	static MTypeId id;
+	static string vxFilePath;
 	Grid grid;
 	static bool gridInitialized;
 	static int lastTime;

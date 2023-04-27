@@ -2,7 +2,6 @@
 #include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 
-static string filePathExport = "";
 
 MStatus initializePlugin(MObject obj)
 {
@@ -18,11 +17,16 @@ MStatus initializePlugin(MObject obj)
 	}
 
 	// Auto-register Mel menu script
-	filePathExport = (plugin.loadPath() + MString("/") + MString("vertexPositions.xyz")).asChar();
+	MPBFluids::vxFilePath = (plugin.loadPath() + MString("/") + MString("vertexPositions.xyz")).asChar();
+
+	if (std::experimental::filesystem::exists(MPBFluids::vxFilePath)) {
+		std::experimental::filesystem::remove(MPBFluids::vxFilePath);
+	}
+
 	MString pluginPath = plugin.loadPath() + MString("/") + MString("PBFluidsMel.mel\"");
 	MString menuPath = MString("source \"") + pluginPath;
 
-	MString melCommand = menuPath + MString("; setCurrPath(\"") + plugin.loadPath() + MString("/)");
+	MString melCommand = menuPath + MString("; setCurrPath(\"") + plugin.loadPath() + MString("/\");");
 	MGlobal::executeCommand(melCommand);
 
 	return status;
@@ -39,8 +43,6 @@ MStatus uninitializePlugin(MObject obj)
 		status.perror("deregisterNode");
 		return status;
 	}
-	
-	// TODO: remove xyz file
 
 	return status;
 }

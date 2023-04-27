@@ -49,16 +49,22 @@ public:
 		particles.clear();
 		allNeighborIDs.clear();
 		cellCoordMap.clear();
-		particleCenters.clear();
 
 		initCellCoordMap();
-		if (particleCenters.size() > 0) {
-			numParticles = particleCenters.size();
-			initParticlesFromMesh();
-		}
-		else {
-			initParticles();
-		}
+		initParticles();
+		initCells();
+	};
+	Grid(int width, int height, float mass, float density, float viscosity, float dt, float radius, const std::vector<GEOM_WOF::Point3> &points) :
+		width(width), height(height), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), particleCenters(points)
+	{
+		gridCells.clear();
+		particles.clear();
+		allNeighborIDs.clear();
+		cellCoordMap.clear();
+
+		initCellCoordMap();
+		numParticles = particleCenters.size();
+		initParticlesFromMesh();
 		initCells();
 	};
 	void operator=(const Grid &g)

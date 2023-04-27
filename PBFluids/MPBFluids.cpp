@@ -1,13 +1,10 @@
 #include "MPBFluids.h"
 
-#include <fstream>
-
 MObject MPBFluids::inputObjects[11];
 MTypeId MPBFluids::id(0x80080);
 bool MPBFluids::gridInitialized(false);
 int MPBFluids::lastTime(0);
-
-//extern string filePathExport;
+string MPBFluids::vxFilePath("");
 
 MString MPointToMString(MPoint p)
 {
@@ -16,7 +13,6 @@ MString MPointToMString(MPoint p)
 
 MStatus MPBFluids::initialize()
 {
-	MGlobal::displayInfo("Start init");
 	MStatus returnStatus;
 
 	MFnNumericAttribute nattr;
@@ -47,9 +43,10 @@ MStatus MPBFluids::initialize()
 		returnStatus = attributeAffects(inputObjects[objCount], inputObjects[10]);
 		McheckErr(returnStatus, "ERROR adding " + objectNames[objCount] + " attributeAffects\n");
 	}
+
 	gridInitialized = false;
 	lastTime = 0;
-	MGlobal::displayInfo("Finish init");
+
 	return returnStatus;
 }
 
@@ -92,16 +89,17 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		McheckErr(returnStatus, "ERROR creating outputData");
 
 		if (!gridInitialized || lastTime > time) {
-			grid = Grid(width, height, mass, density, viscosity, numParticles, dt, radius);
-
 			vector<GEOM_WOF::Point3> vPoints;
-
-			// TODO: read in file path from parameter
-			string filePath = "";
-
-			GEOM_WOF::readPoints_auto(filePath, vPoints);
-			GEOM_WOF::toCloud(vPoints, 0.2, 200, grid.particleCenters);
-
+			bool useCustomInit = std::experimental::filesystem::exists(vxFilePath) && GEOM_WOF::readPoints_auto(vxFilePath, vPoints);
+			if (useCustomInit) {
+				std::vector<GEOM_WOF::Point3> centers;
+				GEOM_WOF::toCloud(vPoints, 1, 1, centers);
+				grid = Grid(width, height, mass, density, viscosity, dt, radius, centers);
+			}
+			else {
+				grid = Grid(width, height, mass, density, viscosity, numParticles, dt, radius);
+			}
+			
 			if (containerObject != MObject::kNullObj) {
 				MFnMesh containerMesh(containerObject, &returnStatus);
 				MPointArray vertexPositions;
@@ -127,13 +125,15 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 				grid.addContainer(containerTriangles);
 			}
 
-			gridInitialized = true;
 			time = 1;
 			lastTime = 1;
 		}
-		else {
+		for (int i = lastTime; i < time; i++)
+		{
 			grid.step();
 		}
+
+		gridInitialized = true;
 		lastTime = time;
 
 		std::vector<MPoint> worldPositions;

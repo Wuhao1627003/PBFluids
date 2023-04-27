@@ -1,4 +1,3 @@
-global string $nameObj_RN;
 global string $currContainerMesh;
 global string $currNode;
 global string $currPath;
@@ -20,189 +19,129 @@ global proc makeWindow()
 
 
     $window = `window -title "PB Fluids"`;
-    	paneLayout -configuration "horizontal4";
-    	
-    	
-    	    frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
-    			columnLayout;
-    				$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 1.0 -field true`;
-    				$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.2 -field true`;
-    				$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
-    			setParent ..;
-    		setParent ..;
-    		
-    		frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
-    			columnLayout;
-    				$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 0.1 -max 10.0 -value 0.2 -field true`;
-    				$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
-    				$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
-    			setParent ..;
-    		setParent ..;
-    		
-    		frameLayout -label "Boundary Settings (Simulation Box)" -collapsable true -backgroundShade true -borderVisible false;
-    			columnLayout;
-    				$widthSlider = `intSliderGrp -label "Width" -min 5 -max 100 -value 10 -field true`;
-    				$heightSlider = `intSliderGrp -label "Height" -min 5 -max 100 -value 10 -field true`;
-    			setParent ..;
-    			
-    			rowLayout -numberOfColumns 4 -adjustableColumn 1;
-        			$nameObj_RN = `textField`;
-                    text -label ", ";
-                    button -label "Selected Mesh" -command "getSelectedMesh";
-                    text -label "";
-        		setParent ..;
-        			
-    			rowLayout -numberOfColumns 1 -adjustableColumn 1 -columnAlign1 "left";
-    			    text -label "Or, You Can Make Selected 3D Mesh As:" -align "left";
-    			setParent ..;
-    			
-    			rowLayout -numberOfColumns 5 -adjustableColumn 4 -columnAlign3 "left" "center" "right";
-        			button -label "Fluid Containers" - command "setAsContainerMesh" -align "left";
-        			text -label "" ;
-    			    button -label "Collision Objects" -command "setAsCollisionMesh" -align "center";
-    			    text -label "";
-    			    button -label "Decompose the Selected Mesh" -command "decomposeSelectedMesh" -align "right";
-    		    setParent ..;
-    			
-    		setParent ..;
-            
-            frameLayout -label "Action" -collapsable false -backgroundShade true -borderVisible false;
-    			rowLayout -numberOfColumns 6 -adjustableColumn 4 -columnAlign3 "left" "center" "right";
-            		button -label "Generate" -command "onDynamicCreate" -align "left";
-            		text -label "";
-            		button -label "Clear" -command "onClear" -align "center";
-            		text -label "";
-            		button -label "Cancel" -command ("deleteUI -window " + $window) -align "right";
-            		text -label "";          		    
-    		    setParent ..;
-    		    
-    		    rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnAlign3 "left" "center" "right";
-            		button -label "Export Sequenece Frames" -command "" -align "left";                      //!!!
-            		text -label "" -align "center";
-            		button -label "Export Fluid Simulation Data" -command "" -align "right"; 		        //!!!
-    		    setParent ..;
-    		    
-    	    setParent ..;    		
-    		
+    frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
+    	columnLayout;
+    		$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 1.0 -field true`;
+    		$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.2 -field true`;
+    		$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
     	setParent ..;
+    setParent ..;
+    		
+    frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
+    	columnLayout;
+    		$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1.0 -max 10.0 -value 2.0 -field true`;
+    		$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    		$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
+    	setParent ..;
+    setParent ..;
+    		
+    frameLayout -label "Boundary Settings (Simulation Box)" -collapsable true -backgroundShade true -borderVisible false;
+    	columnLayout;
+    		$widthSlider = `intSliderGrp -label "Width" -min 5 -max 100 -value 10 -field true`;
+    		$heightSlider = `intSliderGrp -label "Height" -min 5 -max 100 -value 10 -field true`;
+    	setParent ..;
+    setParent ..;
+
+    frameLayout -label "Custom Meshes" -collapsable true -backgroundShade true -borderVisible false;
+        rowLayout -numberOfColumns 1;
+    		text -label "Select a 3D Mesh to set as:";
+    	setParent ..;
+    	rowLayout -numberOfColumns 4 -columnWidth4 60 90 40 150;
+            text -label "";
+        	button -label "Container" -command "setAsContainerMesh" -rs false;
+            text -label "";
+    		button -label "Initial Fluid" -command "decomposeSelectedMesh" -rs false;
+    	setParent ..;
+    setParent ..;
+            
+    rowLayout -numberOfColumns 3 -columnWidth3 150 150 150;
+        button -label "Generate" -command "onDynamicCreate" -rs false -width 150;
+        button -label "Export" -command "export" -rs false -width 150;  
+        button -label "Cancel" -command ("deleteUI -window " + $window) -rs false -width 150;
+    setParent ..;  		
     showWindow $window;
-}
-
-global proc getSelectedMesh() 
-{
-    global string $nameObj_RN;
-
-    string $selected[] = `ls -selection`;
-    int $listSize = `size $selected`;
-
-    if ($listSize == 1) {
-        textField -e -tx $selected[0] $nameObj_RN;
-        print($selected[0] + "\n");
-    }
-    else if ($listSize > 1) {
-        textField -e -tx "Choose One" $nameObj_RN;
-        print("Multiple Selected\n");
-    }
-    else {
-        textField -e -tx "None" $nameObj_RN;
-        print("None Selected\n");
-    }
 }
 
 global proc setAsContainerMesh()
 {
-    global string $nameObj_RN;
     global string $currContainerMesh;
-    
-    string $meshName = `textField -q -tx $nameObj_RN`;
 
-    if(`objExists $meshName`) 
+    string $selected[] = `ls -selection`;
+    int $listSize = `size $selected`;
+    if ($listSize != 1)
     {
-        polyTriangulate -ch 1 $meshName;
-        
-        $currContainerMesh = $meshName;
-        setMeshConfirmation($meshName, "Container");
-    }
-    else
-    {
-        confirmDialog -title "No Mesh Selected Yet" 
-            -message "You have not selected any mesh yet. Please select mesh first!!!"
+        confirmDialog -title "No or multiple meshes selected"
+            -message "Please select ONE mesh as container"
             -button "Ok" 
             -cancelButton "Ok" -defaultButton "Ok";
     }
-}
+    else {
+        string $meshName = $selected[0];
 
-global proc setAsCollisionMesh()
-{
-    // Not Completed Yet!!!
-    global string $nameObj_RN;
-    
-    string $meshName = `textField -q -tx $nameObj_RN`;
-
-    if(`objExists $meshName`) 
-    {
-       //polyTriangulate -ch 1 $meshName;
-       
-       setMeshConfirmation($meshName, "Collision Object");
+        if(`objExists $meshName`) 
+        {
+            polyTriangulate -ch 1 $meshName;
+            $currContainerMesh = $meshName;
+        }
+        else
+        {
+            confirmDialog -title "Mesh doesn't exist" 
+                -button "Ok" 
+                -cancelButton "Ok" -defaultButton "Ok";
+        }
     }
 }
 
 global proc decomposeSelectedMesh()
 {
-    global string $nameObj_RN;
     global string $currNode;
     global string $currPath;
     
-    string $meshName = `textField -q -tx $nameObj_RN`;
-    
-    if(`objExists $meshName`) 
+    string $selected[] = `ls -selection`;
+    int $listSize = `size $selected`;
+    if ($listSize != 1)
     {
-        polyTriangulate -ch 1 $meshName;
-        
-        float $vtxPos[]; 
-        int $count;
-        int $nVerts[] = `polyEvaluate -vertex $meshName`;
-        string $fileName = "vertexPositions.xyz";
-        print $currPath;
-        string $filePath = $currPath + $fileName;
-        //string $fileId;
-        
-        // Open the output file for writing
-        int $fileId = `fopen $filePath  "w"`;
+        confirmDialog -title "No or multiple meshes selected" 
+            -message "Please select ONE mesh to decompose"
+            -button "Ok" 
+            -cancelButton "Ok" -defaultButton "Ok";
+    }
+    else {
+        string $meshName = $selected[0];
     
-        for ($count = 0; $count < $nVerts[0]; $count++)
+        if(`objExists $meshName`) 
         {
-            $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
-            fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2] + "\n");
+            polyTriangulate -ch 1 $meshName;
+        
+            float $vtxPos[]; 
+            int $count;
+            int $nVerts[] = `polyEvaluate -vertex $meshName`;
+            string $fileName = "vertexPositions.xyz";
+            print $currPath;
+            string $filePath = $currPath + $fileName;
+        
+            // Open the output file for writing
+            int $fileId = `fopen $filePath  "w"`;
+    
+            for ($count = 0; $count < $nVerts[0] - 1; $count++)
+            {
+                $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
+                fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2] + "\n");
+            }
+
+            $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + ($nVerts[0] - 1) + "]")`;
+            fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2]);
+    
+            // Close the output file
+            fclose $fileId;
         }
-    
-        // Close the output file
-        fclose $fileId;
-        
-        if(`objExists $currNode` == false)
+        else
         {
-            confirmDialog -title "No Node Created Yet" 
-                -message "Sorry you have to create a PBFluids Node first, please click generate button first!!!"
+            confirmDialog -title "Mesh doesn't exist" 
                 -button "Ok" 
                 -cancelButton "Ok" -defaultButton "Ok";
         }
     }
-    else
-    {
-        confirmDialog -title "No Mesh Selected Yet" 
-            -message "You have not selected any mesh yet. Please select mesh first!!!"
-            -button "Ok" 
-            -cancelButton "Ok" -defaultButton "Ok";
-    }
-}
-
-global proc setMeshConfirmation(string $object, string $type)
-{
-    string $s = $object + "has been successfully set as" + $type;
-    confirmDialog -title "Set Confirmation" 
-        -message $s
-        -button "Ok" 
-        -cancelButton "Ok" -defaultButton "Ok";
 }
 
 global proc printConfirmations(float $mass, float $radius, float $viscosity, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height) 
@@ -258,7 +197,7 @@ global proc onDynamicCreate()
         int $width = `intSliderGrp -q -v $widthSlider`;
         int $height = `intSliderGrp -q -v $heightSlider`;
     
-        print("Creating a dynamic PBFluids with the following inputs:");
+        print("Creating a dynamic PBFluids with the following inputs:\n");
         printConfirmations($mass, $radius, $viscosity, $deltaT, $fluidDensity, $numParticles, $width, $height);
     
         // Set up names
@@ -272,59 +211,31 @@ global proc onDynamicCreate()
     
         // Adding the dynamic node
         $currNode = `createNode MPBFluids -n $nodeName`;
-        //setAttr ($currNode + ".mass") $mass;    // !!!!
+        connectAttr ($currNode + ".outputGeometry") ($currShape + ".inMesh");
+        connectAttr time1.outTime ($currNode + ".timeStep");
+        setAttr ($currNode + ".mass") $mass;
         setAttr ($currNode + ".radius") $radius;
         setAttr ($currNode + ".density") $fluidDensity;
         setAttr ($currNode + ".viscosity") $viscosity;
         setAttr ($currNode + ".deltaT") $deltaT;
-        connectAttr time1.outTime ($currNode + ".timeStep");
         setAttr ($currNode + ".numParticles") $numParticles;
         setAttr ($currNode + ".width") $width;
         setAttr ($currNode + ".height") $height;
-    
-        connectAttr ($currNode + ".outputGeometry") ($currShape + ".inMesh");
-        
+
         if (`objExists $currContainerMesh`)
             {
                 connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
-                print($currContainerMesh + "complete");
-            } 
+                print("Set container mesh: " + $currContainerMesh + "\n");
+            }
+        deleteUI -window $window;
     }
-
-    //deleteUI -window $window;
-
-}
-
-global proc onClear() {
-    
-    global string $currNode;
-    
-    // Clear the Node
-    print("Node Clear Button has pressed...\n");
-
-    string $result = `confirmDialog -title "Clear PBFluids Node" 
-        -message "Clear the PBFluids Node?"
-        -button "Yes" -button "No" 
-        -cancelButton "No"-defaultButton "No"`;
-
-    if ($result == "Yes") {
-        if (`objExists $currNode`)
-        {
-            select -r PBFluids;
-            doDelete;
-            
-            print("PBFluids Clear\n");
-        }
-    } else warning "Reset cancelled: scene preserved\n";
 }
 
 global proc setCurrPath(string $s)
 {
     global string $currPath;
-    
     $currPath = $s;
-    
-    print("Current Path: " + $currPath);
+    print("Current Path: " + $currPath + "\n");
 }
 
 
