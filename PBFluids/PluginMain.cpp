@@ -2,7 +2,6 @@
 #include <maya/MGlobal.h>
 #include <maya/MFnPlugin.h>
 
-
 MStatus initializePlugin(MObject obj)
 {
 	MStatus   status = MStatus::kSuccess;

@@ -146,6 +146,24 @@ global proc decomposeSelectedMesh()
     }
 }
 
+global proc export()
+{
+    global string $currNode;
+    
+    if (`objExists $currNode`)
+    {
+        playblast  -format image -sequenceTime 0 -clearCache 1 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -compression "jpg" -quality 70;
+        currentTime 200 ;
+    }
+    else
+    {
+        confirmDialog -title "Not Node Existed Yet" 
+            -message "No PBFluids node existed Yet, Please generate the node first."
+            -button "Ok" 
+            -cancelButton "Ok" -defaultButton "Ok";
+    }
+}
+
 global proc printConfirmations(float $mass, float $radius, float $viscosity, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height) 
 {
     print("Mass: " + $mass + "\n");
