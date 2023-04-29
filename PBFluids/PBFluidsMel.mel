@@ -149,11 +149,12 @@ global proc decomposeSelectedMesh()
 global proc export()
 {
     global string $currNode;
+    global string $currPath;
     
     if (`objExists $currNode`)
     {
-        playblast  -format image -sequenceTime 0 -clearCache 1 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -compression "jpg" -quality 70;
-        currentTime 200 ;
+        playblast  -format avi -filename $currPath -forceOverwrite  -sequenceTime 0 -clearCache 1 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -compression "none" -quality 70;
+        currentTime 120 ;
     }
     else
     {
@@ -247,7 +248,7 @@ global proc onDynamicCreate()
                 connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
                 print("Set container mesh: " + $currContainerMesh + "\n");
             }
-        deleteUI -window $window;
+        //deleteUI -window $window;
     }
 }
 
