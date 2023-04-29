@@ -147,6 +147,25 @@ global proc decomposeSelectedMesh()
     }
 }
 
+global proc export()
+{
+    global string $currNode;
+    global string $currPath;
+    
+    if (`objExists $currNode`)
+    {
+        playblast  -format avi -filename $currPath -forceOverwrite  -sequenceTime 0 -clearCache 1 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -compression "none" -quality 70;
+        currentTime 120 ;
+    }
+    else
+    {
+        confirmDialog -title "Not Node Existed Yet" 
+            -message "No PBFluids node existed Yet, Please generate the node first."
+            -button "Ok" 
+            -cancelButton "Ok" -defaultButton "Ok";
+    }
+}
+
 global proc printConfirmations(float $mass, float $radius, float $viscosity, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height) 
 {
     print("Mass: " + $mass + "\n");
@@ -230,7 +249,7 @@ global proc onDynamicCreate()
                 connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
                 print("Set container mesh: " + $currContainerMesh + "\n");
             }
-        deleteUI -window $window;
+        //deleteUI -window $window;
     }
 }
 
