@@ -154,7 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(ProjectName).mll</OutputFile>
       <AdditionalLibraryDirectories>$(MAYA_LOCATION)\lib;$(ProjectDir)\wofReleasePURE_v1.13\binaries\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wofPURE_x64_v142_Release.lib;Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;OpenMayaFx.lib;OpenMayaRender.lib;Image.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>wofPURE_x64_v142_Debug.lib;Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;OpenMayaFx.lib;OpenMayaRender.lib;Image.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

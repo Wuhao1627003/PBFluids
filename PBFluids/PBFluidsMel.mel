@@ -129,13 +129,14 @@ global proc decomposeSelectedMesh()
                 $vtxPos = `xform -q -ws -t ($meshName + ".f[" + $fcount + "]")`;
 				for ($vcount = 0; $vcount < 3; $vcount++)
                 {
-                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 1] + " " + $vtxPos[$vcount * 3 + 2] + "\n");
+                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 2] + " " + $vtxPos[$vcount * 3 + 1] + "\n");
                 }
 			}
     
             // Close the output file
             fclose $fileId;
             print("generated .xyz file");
+            setAttr ($meshName + ".visibility") 0;
         }
         else
         {

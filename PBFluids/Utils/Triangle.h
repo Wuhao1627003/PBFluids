@@ -38,6 +38,8 @@ public:
         if (Dot(vel, normal) < 0 && t <= min(dt, radius)) {
             center += velNorm * (t - radius);
             vel -= 2 * Dot(vel, normal) * normal;
+            vel *= 1.5;
+            center += vel * dt;
             return true;
         }
         else // This means that there is a line intersection but not a ray intersection.
