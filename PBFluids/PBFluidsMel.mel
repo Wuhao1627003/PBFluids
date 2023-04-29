@@ -114,29 +114,24 @@ global proc decomposeSelectedMesh()
         {
             polyTriangulate -ch 1 $meshName;
         
-            int $numFaces[] = `polyEvaluate -f $meshName`;
-            int $i;
-            
+            float $vtxPos[]; 
+            int $fcount;
+            int $vcount;
+            int $nFaces[] = `polyEvaluate -face $meshName`;
             string $fileName = "vertexPositions.xyz";
             string $filePath = $currPath + $fileName;
                     
             // Open the output file for writing
             int $fileId = `fopen $filePath  "w"`;
             
-            for ($i = 0; $i < $numFaces[0]; $i++) 
-            {
-                // Get the vertices of the current face
-                string $faceVerts[] = `polyListComponentConversion -ff -tv ($meshName + ".f[" + $i + "]")`;
-                
-                // Print the vertex positions of the face                
-                float $vtxPos[] = `xform -q -ws -t $faceVerts`;
-                    
-                for ($j = 0; $j < 3; $j++)
+            for ($fcount = 0; $fcount < $nFaces[0]; $fcount++)
+			{
+                $vtxPos = `xform -q -ws -t ($meshName + ".f[" + $fcount + "]")`;
+				for ($vcount = 0; $vcount < 3; $vcount++)
                 {
-                    fprint $fileId ($vtxPos[$j * 3 + 0] + " " + $vtxPos[$j * 3 + 1] + " " + $vtxPos[$j * 3 + 2] + "\n");
+                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 1] + " " + $vtxPos[$vcount * 3 + 2] + "\n");
                 }
-                fprint $fileId ("\n");
-            }
+			}
     
             // Close the output file
             fclose $fileId;
