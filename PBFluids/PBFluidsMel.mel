@@ -106,34 +106,41 @@ global proc decomposeSelectedMesh()
             -button "Ok" 
             -cancelButton "Ok" -defaultButton "Ok";
     }
-    else {
+    else 
+    {
         string $meshName = $selected[0];
     
         if(`objExists $meshName`) 
         {
             polyTriangulate -ch 1 $meshName;
         
-            float $vtxPos[]; 
-            int $count;
-            int $nVerts[] = `polyEvaluate -vertex $meshName`;
+            int $numFaces[] = `polyEvaluate -f $meshName`;
+            int $i;
+            
             string $fileName = "vertexPositions.xyz";
-            print $currPath;
             string $filePath = $currPath + $fileName;
-        
+                    
             // Open the output file for writing
             int $fileId = `fopen $filePath  "w"`;
-    
-            for ($count = 0; $count < $nVerts[0] - 1; $count++)
+            
+            for ($i = 0; $i < $numFaces[0]; $i++) 
             {
-                $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
-                fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2] + "\n");
+                // Get the vertices of the current face
+                string $faceVerts[] = `polyListComponentConversion -ff -tv ($meshName + ".f[" + $i + "]")`;
+                
+                // Print the vertex positions of the face                
+                float $vtxPos[] = `xform -q -ws -t $faceVerts`;
+                    
+                for ($j = 0; $j < 3; $j++)
+                {
+                    fprint $fileId ($vtxPos[$j * 3 + 0] + " " + $vtxPos[$j * 3 + 1] + " " + $vtxPos[$j * 3 + 2] + "\n");
+                }
+                fprint $fileId ("\n");
             }
-
-            $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + ($nVerts[0] - 1) + "]")`;
-            fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2]);
     
             // Close the output file
             fclose $fileId;
+            print("generated .xyz file");
         }
         else
         {
