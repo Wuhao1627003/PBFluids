@@ -114,23 +114,24 @@ global proc decomposeSelectedMesh()
             polyTriangulate -ch 1 $meshName;
         
             float $vtxPos[]; 
-            int $count;
-            int $nVerts[] = `polyEvaluate -vertex $meshName`;
+            int $fcount;
+            int $vcount;
+            int $nFaces[] = `polyEvaluate -face $meshName`;
             string $fileName = "vertexPositions.xyz";
             print $currPath;
             string $filePath = $currPath + $fileName;
         
             // Open the output file for writing
             int $fileId = `fopen $filePath  "w"`;
-    
-            for ($count = 0; $count < $nVerts[0] - 1; $count++)
-            {
-                $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + $count + "]")`;
-                fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2] + "\n");
-            }
-
-            $vtxPos = `xform -q -ws -t ($meshName + ".vtx[" + ($nVerts[0] - 1) + "]")`;
-            fprint $fileId ($vtxPos[0] + " " + $vtxPos[1] + " " + $vtxPos[2]);
+            
+            for ($fcount = 0; $fcount < $nFaces[0]; $fcount++)
+			{
+                $vtxPos = `xform -q -ws -t ($meshName + ".f[" + $fcount + "]")`;
+				for ($vcount = 0; $vcount < 3; $vcount++)
+                {
+                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 1] + " " + $vtxPos[$vcount * 3 + 2] + "\n");
+                }
+			}
     
             // Close the output file
             fclose $fileId;
