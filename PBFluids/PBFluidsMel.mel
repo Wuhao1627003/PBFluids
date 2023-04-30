@@ -21,16 +21,16 @@ global proc makeWindow()
     $window = `window -title "PB Fluids"`;
     frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
     	columnLayout;
-    		$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 1.0 -field true`;
-    		$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.2 -field true`;
-    		$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    		$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 3.0 -field true`;
+    		$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.1 -field true`;
+    		$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 3.0 -field true`;
     	setParent ..;
     setParent ..;
     		
     frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
     	columnLayout;
-    		$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1.0 -max 10.0 -value 2.0 -field true`;
-    		$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 1.0 -field true`;
+    		$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1.0 -max 10.0 -value 10.0 -field true`;
+    		$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 3.0 -field true`;
     		$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
     	setParent ..;
     setParent ..;
