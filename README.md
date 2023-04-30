@@ -60,7 +60,9 @@ PATH: %MAYA_LOCATION%\bin, YOUR_PROJECT_LOCATION\PBFluids\wofReleasePURE_v1.13\b
 ## Sample results
 See images and videos included in "Results" folder. Two sample Maya scenes are also included in "PBFluids" folder for testing with PBFluids.
 
-
+<img width="834" alt="PBFluids Node" src="https://user-images.githubusercontent.com/25204397/235381117-f4780fab-3431-44a5-878f-111c2a6cf8ae.png">
+<img width="681" alt="Sample Frame" src="https://user-images.githubusercontent.com/25204397/235381128-fdb717d2-eb78-468c-80c0-5d647ef31788.png">
+<img width="761" alt="Screenshot 2023-04-30 192553" src="https://user-images.githubusercontent.com/25204397/235381142-6caa3985-d4c9-4743-8b2c-672a8fc031c4.png">
 
 ## Video demo
 
