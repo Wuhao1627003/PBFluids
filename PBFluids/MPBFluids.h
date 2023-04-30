@@ -47,4 +47,3 @@ public:
 	static bool gridInitialized;
 	static int lastTime;
 };
-

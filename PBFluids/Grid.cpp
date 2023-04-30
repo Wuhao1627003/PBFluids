@@ -35,12 +35,16 @@ void Grid::initParticlesFromMesh()
 {
 	this->particles.resize(numParticles);
 	this->allNeighborIDs.resize(numParticles);
-	double x, y, z;
 	int cellIdx;
+	double x, y, z;
+
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		particleCenters[particleID].xyz(x, y, z);
+		GEOM_WOF::Point3 p = particleCenters[particleID];
+		p.xyz(x, y, z);
+		x += width / 2;
+		y += width / 2;
 		cellIdx = cellCoordMap.find(vec3((int)x == width ? width - 1 : (int)x, (int)y == width ? width - 1 : (int)y, (int)z == height ? height - 1 : (int)z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius - width / 2, y + radius - width / 2, z + radius));
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x - width / 2, y - width / 2, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -156,45 +160,43 @@ void Grid::step()
 			}
 		}
 		// collision with default box
-		else {
-			int velMultiplier = -1.5;
+		int velMultiplier = -1.5;
 #pragma omp parallel for
-			for (int i = 0; i < particles.size(); i++) {
-				bool hit = false;
-				if (particles[i].posPredicted[0] < -width / 2 + radius) {
-					particles[i].posPredicted[0] = -width / 2 + radius;
-					hit = true;
-					particles[i].vel[0] *= velMultiplier;
-				}
-				if (particles[i].posPredicted[0] > width / 2 - radius) {
-					particles[i].posPredicted[0] = width / 2 - radius;
-					hit = true;
-					particles[i].vel[0] *= velMultiplier;
-				}
-				if (particles[i].posPredicted[1] < -width / 2 + radius) {
-					particles[i].posPredicted[1] = -width / 2 + radius;
-					hit = true;
-					particles[i].vel[1] *= velMultiplier;
-				}
-				if (particles[i].posPredicted[1] > width / 2 - radius) {
-					particles[i].posPredicted[1] = width / 2 - radius;
-					hit = true;
-					particles[i].vel[1] *= velMultiplier;
-				}
-				if (particles[i].posPredicted[2] < radius) {
-					particles[i].posPredicted[2] = radius;
-					hit = true;
-					particles[i].vel[2] *= velMultiplier;
-				}
-				if (particles[i].posPredicted[2] > height - radius) {
-					particles[i].posPredicted[2] = height - radius;
-					hit = true;
-					particles[i].vel[2] *= velMultiplier;
-				}
+		for (int i = 0; i < particles.size(); i++) {
+			bool hit = false;
+			if (particles[i].posPredicted[0] < -width / 2 + radius) {
+				particles[i].posPredicted[0] = -width / 2 + radius;
+				hit = true;
+				particles[i].vel[0] *= velMultiplier;
+			}
+			if (particles[i].posPredicted[0] > width / 2 - radius) {
+				particles[i].posPredicted[0] = width / 2 - radius;
+				hit = true;
+				particles[i].vel[0] *= velMultiplier;
+			}
+			if (particles[i].posPredicted[1] < -width / 2 + radius) {
+				particles[i].posPredicted[1] = -width / 2 + radius;
+				hit = true;
+				particles[i].vel[1] *= velMultiplier;
+			}
+			if (particles[i].posPredicted[1] > width / 2 - radius) {
+				particles[i].posPredicted[1] = width / 2 - radius;
+				hit = true;
+				particles[i].vel[1] *= velMultiplier;
+			}
+			if (particles[i].posPredicted[2] < radius) {
+				particles[i].posPredicted[2] = radius;
+				hit = true;
+				particles[i].vel[2] *= velMultiplier;
+			}
+			if (particles[i].posPredicted[2] > height - radius) {
+				particles[i].posPredicted[2] = height - radius;
+				hit = true;
+				particles[i].vel[2] *= velMultiplier;
+			}
 
-				if (hit) {
-					particles[i].posPredicted += particles[i].vel * dt;
-				}
+			if (hit) {
+				particles[i].posPredicted += particles[i].vel * dt;
 			}
 		}
 	}

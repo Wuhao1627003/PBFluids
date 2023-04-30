@@ -93,7 +93,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 			bool useCustomInit = std::experimental::filesystem::exists(vxFilePath) && GEOM_WOF::readPoints_auto(vxFilePath, vPoints);
 			if (useCustomInit) {
 				std::vector<GEOM_WOF::Point3> centers;
-				GEOM_WOF::toCloud(vPoints, 1, 1, centers);
+				GEOM_WOF::toCloud(vPoints, radius, 30.0, centers);
 				grid = Grid(width, height, mass, density, viscosity, dt, radius, centers);
 			}
 			else {

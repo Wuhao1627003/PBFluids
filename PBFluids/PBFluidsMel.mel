@@ -106,7 +106,8 @@ global proc decomposeSelectedMesh()
             -button "Ok" 
             -cancelButton "Ok" -defaultButton "Ok";
     }
-    else {
+    else 
+    {
         string $meshName = $selected[0];
     
         if(`objExists $meshName`) 
@@ -118,9 +119,8 @@ global proc decomposeSelectedMesh()
             int $vcount;
             int $nFaces[] = `polyEvaluate -face $meshName`;
             string $fileName = "vertexPositions.xyz";
-            print $currPath;
             string $filePath = $currPath + $fileName;
-        
+                    
             // Open the output file for writing
             int $fileId = `fopen $filePath  "w"`;
             
@@ -129,12 +129,14 @@ global proc decomposeSelectedMesh()
                 $vtxPos = `xform -q -ws -t ($meshName + ".f[" + $fcount + "]")`;
 				for ($vcount = 0; $vcount < 3; $vcount++)
                 {
-                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 1] + " " + $vtxPos[$vcount * 3 + 2] + "\n");
+                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 2] + " " + $vtxPos[$vcount * 3 + 1] + "\n");
                 }
 			}
     
             // Close the output file
             fclose $fileId;
+            print("generated .xyz file");
+            setAttr ($meshName + ".visibility") 0;
         }
         else
         {
@@ -142,6 +144,25 @@ global proc decomposeSelectedMesh()
                 -button "Ok" 
                 -cancelButton "Ok" -defaultButton "Ok";
         }
+    }
+}
+
+global proc export()
+{
+    global string $currNode;
+    global string $currPath;
+    
+    if (`objExists $currNode`)
+    {
+        playblast  -format avi -filename $currPath -forceOverwrite  -sequenceTime 0 -clearCache 1 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -compression "none" -quality 70;
+        currentTime 120 ;
+    }
+    else
+    {
+        confirmDialog -title "Not Node Existed Yet" 
+            -message "No PBFluids node existed Yet, Please generate the node first."
+            -button "Ok" 
+            -cancelButton "Ok" -defaultButton "Ok";
     }
 }
 
@@ -228,7 +249,7 @@ global proc onDynamicCreate()
                 connectAttr ($currContainerMesh + ".worldMesh")($currNode + ".container");
                 print("Set container mesh: " + $currContainerMesh + "\n");
             }
-        deleteUI -window $window;
+        //deleteUI -window $window;
     }
 }
 
