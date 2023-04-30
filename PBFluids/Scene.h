@@ -16,10 +16,10 @@ public:
 		}
 	}
 
-	bool bounce(vec3 &center, float radius, vec3 &vel, float dt)
+	bool bounce(vec3 &center, float radius, vec3 &vel, float dt, float mass)
 	{
 		for (Triangle triangle : sceneTriangles) {
-			bool hit = triangle.bounce(center, radius, vel, dt);
+			bool hit = triangle.bounce(center, radius, vel, dt, mass);
 			if (hit) {
 				return true;
 			}

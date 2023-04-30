@@ -156,13 +156,16 @@ void Grid::step()
 		if (this->scene.sceneTriangles.size() > 0) {
 #pragma omp parallel for
 			for (int i = 0; i < particles.size(); i++) {
-				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter);
+				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter, particleMass);
 			}
 		}
 		// collision with default box
-		int velMultiplier = -1.5;
+		int velMultiplier = -1.5 / sqrt(particleMass);
 #pragma omp parallel for
 		for (int i = 0; i < particles.size(); i++) {
+			if (particles[i].vel.Length() < 1) {
+				particles[i].vel = vec3(0, 0, 0);
+			}
 			bool hit = false;
 			if (particles[i].posPredicted[0] < -width / 2 + radius) {
 				particles[i].posPredicted[0] = -width / 2 + radius;

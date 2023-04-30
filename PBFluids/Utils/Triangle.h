@@ -15,7 +15,7 @@ public:
 	};
 
     // dt passed in here should be divided by numIter first
-	bool bounce(vec3 &center, float radius, vec3 &vel, float dt)
+	bool bounce(vec3 &center, float radius, vec3 &vel, float dt, float mass)
 	{
         vec3 velNorm = vel.Normalize();
         vec3 h = velNorm ^ e2;
@@ -37,8 +37,12 @@ public:
         float t = f * Dot(e2, q);
         if (Dot(vel, normal) < 0 && t <= min(dt, radius)) {
             center += velNorm * (t - radius);
+            if (vel.Length() < 1) {
+                vel = vec3(0, 0, 0);
+                return true;
+            }
             vel -= 2 * Dot(vel, normal) * normal;
-            vel *= 1.5;
+            vel *= 1.5 / sqrt(mass);
             center += vel * dt;
             return true;
         }
