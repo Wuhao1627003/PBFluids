@@ -1,5 +1,7 @@
 #include "Grid.h"
 
+#define initCondition 2
+
 void Grid::initCellCoordMap()
 {
 	this->gridCells.resize(width * width * height);
@@ -23,9 +25,25 @@ void Grid::initParticles()
 	int cellIdx;
 
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		x = (3 + (float) rand() / RAND_MAX) * worldWidth / 4;
-		y = (float) rand() / RAND_MAX * worldWidth;
-		z = (float) rand() / RAND_MAX * worldHeight;
+		if (initCondition == 0) {
+			// Random Init
+			x = (float) rand() / RAND_MAX * worldWidth;
+			y = (float) rand() / RAND_MAX * worldWidth;
+			z = (float) rand() / RAND_MAX * worldHeight;
+		}
+		else if (initCondition == 1) {
+			// Block Init
+			x = (1 + 2 * (float) rand() / RAND_MAX) * worldWidth / 4;
+			y = (1 + 2 * (float) rand() / RAND_MAX) * worldWidth / 4;
+			z = (3 + (float) rand() / RAND_MAX) * worldHeight / 4;
+		}
+		else if (initCondition == 2) {
+			// Diagonal Init
+			x = (float) rand() / RAND_MAX * worldWidth;
+			y = (float) rand() / RAND_MAX * worldWidth;
+			z = (float) rand() / RAND_MAX * min(y,(float) worldHeight);
+		}
+
 		cellIdx = cellCoordMap.find(vec3((int) x == worldWidth ? width - 1: (int) (x / cellSize), (int) y == worldWidth ? width - 1 : (int) (y / cellSize), (int) z == worldHeight ? height - 1 : (int) (z / cellSize)))->second;
 		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x - worldWidth / 2, y - worldWidth / 2, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
@@ -118,20 +136,22 @@ void Grid::step()
 		for (long p_i = 0; p_i < particles.size(); p_i++) {
 			vector<long> neighbours = allNeighborIDs[p_i];
 			for (long p_j : neighbours) {
-				particles[p_i].density += particleMass * kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted);
+				particles[p_i].density += particleMass * kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted, cellSize);
 
 				// accumulate gradient norm
 				vec3 gradTemp = vec3(0, 0, 0);
 				if (p_i == p_j) {
 					for (long p_k : neighbours) {
-						gradTemp += kernel_spiky(particles[p_i].posPredicted, particles[p_k].posPredicted);
+						gradTemp += kernel_spiky(particles[p_i].posPredicted, particles[p_k].posPredicted, cellSize);
 					}
 				}
 				else {
-					gradTemp = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted);
+					gradTemp = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted, cellSize);
 				}
 
-				particles[p_i].gradNorm += (gradTemp / this->density).Length();
+				if (neighbours.size() > 0) {
+					particles[p_i].gradNorm += (gradTemp / this->density).Length();
+				}
 			}
 
 			// Compute constraint and lambda
@@ -144,12 +164,14 @@ void Grid::step()
 #pragma omp parallel for
 		for (int p_i = 0; p_i < particles.size(); p_i++) {
 			for (int p_j : allNeighborIDs[p_i]) {
-				vec3 spikyKernel = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted);
-				float s_corr = -kTensile * pow(kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted), nTensile) / tensileStabilityDenom;
+				vec3 spikyKernel = kernel_spiky(particles[p_i].posPredicted, particles[p_j].posPredicted, cellSize);
+				float s_corr = -kTensile * pow(kernel_poly6(particles[p_i].posPredicted, particles[p_j].posPredicted, cellSize), nTensile) / tensileStabilityDenom;
 				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
 			}
-			particles[p_i].deltaP /= this->density;
-			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt;
+			if (allNeighborIDs[p_i].size() > 0) {
+				particles[p_i].deltaP /= this->density;
+				particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt;
+			}
 		}
 
 		// --------- Collision with Container
@@ -161,7 +183,7 @@ void Grid::step()
 			}
 		}
 		// collision with default box
-		float velMultiplier = -0.6;
+		float velMultiplier = -0.9;
 #pragma omp parallel for
 		for (int i = 0; i < particles.size(); i++) {
 			bool hit = false;

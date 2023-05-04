@@ -1,8 +1,9 @@
 #include "Particle.h"
+#include "Grid.h"
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., 0., -20) * dt;
+	this->vel += vec3(0., 0., -50) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 
@@ -38,14 +39,14 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
 
     // Compute curl
     for (int p_j : neighborIDs) {
-        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted);
+        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted, cellSize);
         v_ji = particles[p_j].vel - this->vel;
         this->omega += v_ji.Cross(ker_res);
     }
 
     // Compute differential operator norm
     for (long p_j : neighborIDs) {
-        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted);
+        vec3 ker_res = kernel_spiky(this->posPredicted, particles[p_j].posPredicted, cellSize);
         this->eta += particles[p_j].omega.Length() * ker_res;
     }
     if (this->eta.Length() > 0) {
@@ -59,7 +60,7 @@ void Particle::postprocess(float dt, vector<long> neighborIDs, vector<Particle>&
 	// ----------- Computed Viscosity ---------
     vec3 v_new = this->vel;
     for (long p_j : neighborIDs) {
-        v_new += 0.0001 * kernel_poly6(this->posPredicted, particles[p_j].posPredicted) * (particles[p_j].vel - this->vel);
+        v_new += 0.0001 * kernel_poly6(this->posPredicted, particles[p_j].posPredicted, cellSize) * (particles[p_j].vel - this->vel);
     }
     this->vel = v_new;
 

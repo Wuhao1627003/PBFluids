@@ -167,7 +167,7 @@ MStatus MPBFluids::compute(const MPlug &plug, MDataBlock &data)
 		}
 
 		// Sets output geometry data to newly processed data
-		dataHandle[10].set(newOutputData);
+		dataHandle[9].set(newOutputData);
 		data.setClean(plug);
 	}
 	else
