@@ -28,15 +28,15 @@ using namespace GEOM_WOF;
 
 int operationToCloud()
 {
-	std::string inFile("../../data/Music_Art_org.ply");
+	std::string inFile("S:/Maya2022/devkitBase/plugins/plugins/vertexPositions.xyz");
 
 	// * 1 *   Read the triangle corners
 	GEOM_WOF::TimerC timerRead;
 	std::vector<GEOM_WOF::Point3> vInCorners;
 	switch(GEOM_WOF::getFileType(inFile))
 	{
-		case GEOM_WOF::FT_STL:
-			GEOM_WOF::readSTL_ASCII(inFile.c_str(),vInCorners);
+		case GEOM_WOF::FT_XYZ:
+			GEOM_WOF::readPoints_auto(inFile,vInCorners);
 			break;
 		case GEOM_WOF::FT_PLY:
 			GEOM_WOF::readPly(inFile.c_str(),false,vInCorners);

@@ -13,6 +13,7 @@ using namespace std;
 #define cfmEpsilon 60.0    // Constraint Force Mixing Relaxation
 #define kTensile 0.1
 #define nTensile 4
+#define cellSize 0.5
 
 struct Hash
 {
@@ -36,14 +37,14 @@ public:
 	vector<Cell> gridCells;
 	vector<Particle> particles;
 	vector<vector<long>> allNeighborIDs;
-	int width, height;
+	int width, height, worldWidth, worldHeight;
 	long numParticles;
 	float radius, particleMass;
 	std::vector<GEOM_WOF::Point3> particleCenters;
 		
 	Grid() {};
-	Grid(int width, int height, float mass, float density, float viscosity, long numParticles, float dt, float radius):
-		width(width), height(height), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
+	Grid(int inWidth, int inHeight, float mass, float density, float viscosity, long numParticles, float dt, float radius):
+		worldWidth(inWidth), worldHeight(inHeight), width((int) (inWidth / cellSize)), height((int) (inHeight / cellSize)), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
 	{
 		gridCells.clear();
 		particles.clear();
@@ -54,8 +55,8 @@ public:
 		initParticles();
 		initCells();
 	};
-	Grid(int width, int height, float mass, float density, float viscosity, float dt, float radius, const std::vector<GEOM_WOF::Point3> &points) :
-		width(width), height(height), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), particleCenters(points)
+	Grid(int inWidth, int inHeight, float mass, float density, float viscosity, float dt, float radius, const std::vector<GEOM_WOF::Point3> &points) :
+		worldWidth(inWidth), worldHeight(inHeight), width((int) (inWidth / cellSize)), height((int) (inHeight / cellSize)), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), particleCenters(points)
 	{
 		gridCells.clear();
 		particles.clear();
@@ -71,6 +72,8 @@ public:
 	{
 		this->width = g.width;
 		this->height = g.height;
+		this->worldHeight = g.worldHeight;
+		this->worldWidth = g.worldWidth;
 		this->particleMass = g.particleMass;
 		this->density = g.density;
 		this->viscosity = g.viscosity;

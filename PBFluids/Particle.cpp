@@ -2,7 +2,7 @@
 
 void Particle::preprocess(float dt)
 {
-	this->vel += vec3(0., 0., -10) * dt;
+	this->vel += vec3(0., 0., -20) * dt;
 	this->posPredicted = this->pos + this->vel * dt;
 }
 

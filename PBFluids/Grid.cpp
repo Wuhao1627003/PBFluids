@@ -21,12 +21,13 @@ void Grid::initParticles()
 	this->allNeighborIDs.resize(numParticles);
 	float x, y, z;
 	int cellIdx;
+
 	for (long particleID = 0; particleID < numParticles; particleID++) {
-		x = (float)rand() / RAND_MAX * width / 4;
-		y = (float)rand() / RAND_MAX * width / 4;
-		z = (1. + (float) rand() / RAND_MAX) * height / 4;
-		cellIdx = cellCoordMap.find(vec3((int) x == width ? width - 1: (int) x, (int) y == width ? width - 1 : (int) y, (int) z == height ? height - 1 : (int) z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x + radius - width / 2, y + radius - width / 2, z + radius));
+		x = (3 + (float) rand() / RAND_MAX) * worldWidth / 4;
+		y = (float) rand() / RAND_MAX * worldWidth;
+		z = (float) rand() / RAND_MAX * worldHeight;
+		cellIdx = cellCoordMap.find(vec3((int) x == worldWidth ? width - 1: (int) (x / cellSize), (int) y == worldWidth ? width - 1 : (int) (y / cellSize), (int) z == worldHeight ? height - 1 : (int) (z / cellSize)))->second;
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x - worldWidth / 2, y - worldWidth / 2, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -41,10 +42,10 @@ void Grid::initParticlesFromMesh()
 	for (long particleID = 0; particleID < numParticles; particleID++) {
 		GEOM_WOF::Point3 p = particleCenters[particleID];
 		p.xyz(x, y, z);
-		x += width / 2;
-		y += width / 2;
-		cellIdx = cellCoordMap.find(vec3((int)x == width ? width - 1 : (int)x, (int)y == width ? width - 1 : (int)y, (int)z == height ? height - 1 : (int)z))->second;
-		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x - width / 2, y - width / 2, z));
+		x += worldWidth / 2;
+		y += worldWidth / 2;
+		cellIdx = cellCoordMap.find(vec3((int) x == worldWidth ? width - 1 : (int) (x / cellSize), (int) y == worldWidth ? width - 1 : (int) (y / cellSize), (int) z == worldHeight ? height - 1 : (int) (z / cellSize)))->second;
+		this->particles[particleID] = Particle(particleID, cellIdx, vec3(x - worldWidth / 2, y - worldWidth / 2, z));
 		this->gridCells[cellIdx].particleIDs.push_back(particleID);
 	}
 }
@@ -79,7 +80,7 @@ void Grid::initCells()
 
 void Grid::updateParticleCell(Particle &p)
 {
-	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) p.pos[0] + width / 2, (int) p.pos[1] + width / 2, (int) p.pos[2]));
+	unordered_map<vec3, int>::iterator it = cellCoordMap.find(vec3((int) (p.pos[0] / cellSize + width / 2), (int) (p.pos[1] / cellSize + width / 2), (int) (p.pos[2] / cellSize)));
 	if (it == cellCoordMap.end()) {
 		// Out of boundary
 		return;
@@ -148,7 +149,7 @@ void Grid::step()
 				particles[p_i].deltaP += (particles[p_i].lambda + particles[p_j].lambda + s_corr) * spikyKernel;
 			}
 			particles[p_i].deltaP /= this->density;
-			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt / numIter;
+			particles[p_i].posPredicted += 0.005 * particles[p_i].deltaP * dt;
 		}
 
 		// --------- Collision with Container
@@ -156,50 +157,50 @@ void Grid::step()
 		if (this->scene.sceneTriangles.size() > 0) {
 #pragma omp parallel for
 			for (int i = 0; i < particles.size(); i++) {
-				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter, particleMass);
+				this->scene.bounce(particles[i].posPredicted, radius, particles[i].vel, dt / numIter);
 			}
 		}
 		// collision with default box
-		int velMultiplier = -1.5 / sqrt(particleMass);
+		float velMultiplier = -0.6;
 #pragma omp parallel for
 		for (int i = 0; i < particles.size(); i++) {
-			if (particles[i].vel.Length() < 1) {
-				particles[i].vel = vec3(0, 0, 0);
-			}
 			bool hit = false;
-			if (particles[i].posPredicted[0] < -width / 2 + radius) {
-				particles[i].posPredicted[0] = -width / 2 + radius;
+			if (particles[i].posPredicted[0] < -worldWidth / 2.0 && particles[i].vel[0] < 0) {
+				particles[i].posPredicted[0] = -worldWidth / 2.0;
 				hit = true;
 				particles[i].vel[0] *= velMultiplier;
 			}
-			if (particles[i].posPredicted[0] > width / 2 - radius) {
-				particles[i].posPredicted[0] = width / 2 - radius;
+			if (particles[i].posPredicted[0] > worldWidth / 2.0 && particles[i].vel[0] > 0) {
+				particles[i].posPredicted[0] = worldWidth / 2.0;
 				hit = true;
 				particles[i].vel[0] *= velMultiplier;
 			}
-			if (particles[i].posPredicted[1] < -width / 2 + radius) {
-				particles[i].posPredicted[1] = -width / 2 + radius;
+			if (particles[i].posPredicted[1] < -worldWidth / 2.0 && particles[i].vel[1] < 0) {
+				particles[i].posPredicted[1] = -worldWidth / 2.0;
 				hit = true;
 				particles[i].vel[1] *= velMultiplier;
 			}
-			if (particles[i].posPredicted[1] > width / 2 - radius) {
-				particles[i].posPredicted[1] = width / 2 - radius;
+			if (particles[i].posPredicted[1] > worldWidth / 2.0 && particles[i].vel[1] > 0) {
+				particles[i].posPredicted[1] = worldWidth / 2.0;
 				hit = true;
 				particles[i].vel[1] *= velMultiplier;
 			}
-			if (particles[i].posPredicted[2] < radius) {
-				particles[i].posPredicted[2] = radius;
+			if (particles[i].posPredicted[2] < 0 && particles[i].vel[2] < 0) {
+				particles[i].posPredicted[2] = 0;
 				hit = true;
 				particles[i].vel[2] *= velMultiplier;
 			}
-			if (particles[i].posPredicted[2] > height - radius) {
-				particles[i].posPredicted[2] = height - radius;
+			if (particles[i].posPredicted[2] > worldHeight && particles[i].vel[2] > 0) {
+				particles[i].posPredicted[2] = worldHeight;
 				hit = true;
 				particles[i].vel[2] *= velMultiplier;
 			}
 
 			if (hit) {
-				particles[i].posPredicted += particles[i].vel * dt;
+				if (particles[i].vel.Length() < 3) {
+					particles[i].vel = vec3(0, 0, 0);
+				}
+				particles[i].posPredicted += 7 * particles[i].vel * dt / numIter;
 			}
 		}
 	}
