@@ -45,6 +45,8 @@ public:
 	Grid() {};
 	Grid(int inWidth, int inHeight, float mass, float density, float viscosity, long numParticles, float dt, float radius):
 		worldWidth(inWidth), worldHeight(inHeight), width((int) (inWidth / cellSize)), height((int) (inHeight / cellSize)), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
+	Grid(int width, int height, float mass, float viscosity, long numParticles, float dt, float radius):
+		width(width), height(height), particleMass(mass), viscosity(viscosity), dt(dt), radius(radius), numParticles(numParticles)
 	{
 		gridCells.clear();
 		particles.clear();
@@ -57,6 +59,8 @@ public:
 	};
 	Grid(int inWidth, int inHeight, float mass, float density, float viscosity, float dt, float radius, const std::vector<GEOM_WOF::Point3> &points) :
 		worldWidth(inWidth), worldHeight(inHeight), width((int) (inWidth / cellSize)), height((int) (inHeight / cellSize)), particleMass(mass), density(density), viscosity(viscosity), dt(dt), radius(radius), particleCenters(points)
+	Grid(int width, int height, float mass, float viscosity, float dt, float radius, const std::vector<GEOM_WOF::Point3> &points) :
+		width(width), height(height), particleMass(mass), viscosity(viscosity), dt(dt), radius(radius), particleCenters(points)
 	{
 		gridCells.clear();
 		particles.clear();

@@ -11,7 +11,7 @@ global proc makeWindow()
     global string $viscositySlider;
     
     global string $deltaTSlider;
-    global string $fluidDensitySlider;
+    //global string $fluidDensitySlider;
     global string $numParticlesSlider;
     
     global string $widthSlider;
@@ -21,17 +21,16 @@ global proc makeWindow()
     $window = `window -title "PB Fluids"`;
     frameLayout -label "Particle Properties" -collapsable true -backgroundShade true -borderVisible false;
     	columnLayout;
-    		$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 3.0 -field true`;
-    		$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.1 -field true`;
-    		$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 3.0 -field true`;
+    		$massSlider = `floatSliderGrp -label "Mass" -min 0.1 -max 10.0 -value 1.0 -field true`;
+    		$radiusSlider = `floatSliderGrp -label "Radius" -min 0.1 -max 10.0 -value 0.2 -field true`;
+    		$viscositySlider = `floatSliderGrp -label "Viscosity" -min 1.0 -max 10.0 -value 1.0 -field true`;
     	setParent ..;
     setParent ..;
     		
     frameLayout -label "Simulation Setting" -collapsable true -backgroundShade true -borderVisible false;
     	columnLayout;
-    		$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1.0 -max 100.0 -value 10.0 -field true`;
-    		$fluidDensitySlider = `floatSliderGrp -label "Fluid Density" -min 1.0 -max 10.0 -value 3.0 -field true`;
-    		$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 1 -max 10000 -value 5000 -field true`;
+    		$deltaTSlider = `floatSliderGrp -label "Timestep Length" -min 1.0 -max 10.0 -value 2.0 -field true`;
+    		$numParticlesSlider = `intSliderGrp -label "Number of Particles" -min 10 -max 10000 -value 50 -field true`;
     	setParent ..;
     setParent ..;
     		
@@ -129,14 +128,13 @@ global proc decomposeSelectedMesh()
                 $vtxPos = `xform -q -ws -t ($meshName + ".f[" + $fcount + "]")`;
 				for ($vcount = 0; $vcount < 3; $vcount++)
                 {
-                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 2] + " " + $vtxPos[$vcount * 3 + 1] + "\n");
+                    fprint $fileId ($vtxPos[$vcount * 3] + " " + $vtxPos[$vcount * 3 + 1] + " " + $vtxPos[$vcount * 3 + 2] + "\n");
                 }
 			}
     
             // Close the output file
             fclose $fileId;
             print("generated .xyz file");
-            setAttr ($meshName + ".visibility") 0;
         }
         else
         {
@@ -166,14 +164,14 @@ global proc export()
     }
 }
 
-global proc printConfirmations(float $mass, float $radius, float $viscosity, float $deltaT, float $fluidDensity, int $numParticles, int $width, int $height) 
+global proc printConfirmations(float $mass, float $radius, float $viscosity, float $deltaT, int $numParticles, int $width, int $height) 
 {
     print("Mass: " + $mass + "\n");
     print("Radius: " + $radius + "\n");
     print("Viscosity: " + $viscosity + "\n");
     
     print("Delta T: " + $deltaT + "\n");
-    print("Fluid Density: " + $fluidDensity + "\n");
+    //print("Fluid Density: " + $fluidDensity + "\n");
     print("Num of Particles: " + $numParticles + "\n");
     
     print("Width: " + $width + "\n");
@@ -191,7 +189,7 @@ global proc onDynamicCreate()
     global string $viscositySlider;
     
     global string $deltaTSlider;
-    global string $fluidDensitySlider;
+    //global string $fluidDensitySlider;
     global string $numParticlesSlider;
     
     global string $widthSlider;
@@ -213,14 +211,14 @@ global proc onDynamicCreate()
         float $viscosity = `floatSliderGrp -q -v $viscositySlider`;
         
         float $deltaT = `floatSliderGrp -q -v $deltaTSlider`;
-        float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
+        //float $fluidDensity = `floatSliderGrp -q -v $fluidDensitySlider`;
         int $numParticles = `intSliderGrp -q -v $numParticlesSlider`;
         
         int $width = `intSliderGrp -q -v $widthSlider`;
         int $height = `intSliderGrp -q -v $heightSlider`;
     
         print("Creating a dynamic PBFluids with the following inputs:\n");
-        printConfirmations($mass, $radius, $viscosity, $deltaT, $fluidDensity, $numParticles, $width, $height);
+        printConfirmations($mass, $radius, $viscosity, $deltaT, $numParticles, $width, $height);
     
         // Set up names
         string $PBFluidsName = "PBFluids";
@@ -237,7 +235,7 @@ global proc onDynamicCreate()
         connectAttr time1.outTime ($currNode + ".timeStep");
         setAttr ($currNode + ".mass") $mass;
         setAttr ($currNode + ".radius") $radius;
-        setAttr ($currNode + ".density") $fluidDensity;
+        //setAttr ($currNode + ".density") $fluidDensity;
         setAttr ($currNode + ".viscosity") $viscosity;
         setAttr ($currNode + ".deltaT") $deltaT;
         setAttr ($currNode + ".numParticles") $numParticles;
